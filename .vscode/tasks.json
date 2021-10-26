@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Minify css",
+      "type": "shell",
+      "command": "for file in dist/*.css; do python3 tools/minify_css.py $file; done"
+    },
+    {
+      "label": "Minify this file",
+      "type": "shell",
+      "command": "python3 tools/minify_css.py ${relativeFile}"
+    }
+  ]
+}

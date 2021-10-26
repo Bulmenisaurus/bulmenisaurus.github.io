@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Bulmenisaurus</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="dark light" />
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Quicksand&family=Roboto&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playball&display=swap&text=sa"
+            rel="stylesheet"
+        />
+
+        <!-- My assets: -->
+        <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+        <script src="dist/themechanger.js"></script>
+        <script src="dist/script.js" defer></script>
+        <script src="tools/date-increments.js"></script>
+        <link rel="stylesheet" type="text/css" href="dist/popup.min.css" />
+        <link rel="stylesheet" type="text/css" href="dist/style.min.css" class="js-dynamic-css" />
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400&display=swap"
+            rel="stylesheet"
+        />
+        <!---
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; child-src 'none'; object-src 'none'; font-src https://bulmenisaurus.github.io https://fonts.gstatic.com; style-src https://bulmenisaurus.github.io https://fonts.googleapis.com/ 'sha256-0U9m0VctOkO6Q1rLyw9WTPguzcfeNhneuOutw8Kry3Q='; img-src https://bulmenisaurus.github.io https://www.google-analytics.com; script-src-elem https:; script-src https://www.google-analytics.com; base-uri 'none'; connect-src https:; form-action 'none'">
+    --></head>
+
+    <body data-theme="dark">
+        <h1>
+            <span id="t1">Bulmenisaurus</span><span id="t2">.github</span><span id="t3">.</span
+            ><span id="t4">io</span>
+        </h1>
+        <hr />
+        <main>
+            <div class="grid-container">
+                <article class="card">
+                    <h2>Welcome!</h2>
+                    <p>
+                        Welcome to my site! If you're lucky, about now I'm planning what cool things
+                        to put on my site! ;) Also, if you have any suggestions on how to improve
+                        bulmenisaurus.github.io, just keep them to yourself for now. :D I need to
+                        learn how to use Javascript too, so for a good while this will just be
+                        something to look at. <br /><br />
+                        Here are some things I hope to accomplish with this site:
+                    </p>
+                    <ul>
+                        <li>Create new sub-pages</li>
+                        <li>Apply my color palette</li>
+                        <li>Usable buttons using JavaScript</li>
+                        <li>Animations</li>
+                    </ul>
+                </article>
+                <article class="card">
+                    <h2>About me!</h2>
+                    <p>
+                        The creator of this site, Mr. Bulmeni, is cool. Here's why FAANG should hire
+                        me: <br /><br />
+                        I have experience with:
+                    </p>
+                    <ul>
+                        <!-- 2020-07-15 2:16:15 PM -->
+                        <li>
+                            Python, for
+                            <date-increment
+                                data-from="2020-07-15 2:16:15"
+                                data-in="weeks"
+                                data-update-every="10"
+                                data-todecimals="15"
+                            ></date-increment>
+                            weeks
+                        </li>
+                        <li>~<span id="js-scss-size"></span> kb of SCSS</li>
+                        <!-- 8/5/20, 6:05 PM -->
+                        <li>
+                            <date-increment
+                                data-from="8/5/20, 6:05 PM"
+                                data-in="minutes"
+                                data-todecimals="0"
+                                data-update-every="60000"
+                            ></date-increment>
+                            minutes of
+                            <strong><code>&lt;HTML&gt;</code></strong>
+                        </li>
+                        <!-- joined "2019-08-16T17:18:01.000Z" -->
+                        <li>
+                            Scratch (<date-increment
+                                data-from="2019-08-16T17:18:01.000Z"
+                                data-in="years"
+                                data-todecimals="1"
+                            ></date-increment>
+                            year[s])
+                        </li>
+                        <!-- 9/13/2020 (https://github.com/Bulmenisaurus/bulmenisaurus.github.io/commit/4cf6ea73db2ee36f5c073beaa427dd42637fe321)-->
+                        <li>Over 2 seconds of JavaScript (gotta be honest)</li>
+                        <li>
+                            A magnificent keyboard <small><del>not really</del></small>
+                        </li>
+                        <li class="hidden">
+                            I'm also experienced with trickery :D<br />i&#8203;d: html_coding
+                        </li>
+                    </ul>
+                </article>
+                <article class="card">
+                    <h2 title="Wow! That was an easy one! id: easy-peasy">Easter Eggs:</h2>
+                    <blockquote cite="https://www.lexico.com/en/definition/easter_egg">
+                        An unexpected or undocumented feature in a piece of computer software or on
+                        a DVD, included as a joke or a bonus.
+                        <cite>-Oxford languages, 2020</cite>
+                    </blockquote>
+                    <p>
+                        There are a couple of these Easter eggs scattered all across this site. Can
+                        you find them all? Easter eggs might be pretty difficult to spot, but if you
+                        have some initial knowledge, it might be a piece of cake! Some times you
+                        might need to open up the console, or hover over some text (sorry, mobile
+                        users), or click on something you wouldn't otherwise. You might have to
+                        select some text, press a button, or go to a secret page. To help you a bit,
+                        here's an easy one, although the other ones will be a bit more challenging:
+                    </p>
+                    <button id="easter-egg">An easter egg!</button>
+                </article>
+                <article class="card">
+                    <h2>Some sub-pages:</h2>
+                    <p>Here you will find some useful or fun subpages on my site!</p>
+                    <ul>
+                        <li>
+                            <a href="/store"><code>/store</code></a> - create valentine cards
+                        </li>
+                        <li>
+                            <a href="/snake"><code>/snake</code></a> - play some snake (WIP)
+                        </li>
+                        <li>
+                            <a href="/secrets"><code>/secrets</code></a> - try to find all of the
+                            easter eggs on the page
+                        </li>
+                        <li>
+                            <a href="/terminal"><code>/terminal</code></a> - encode secret messages
+                            to send to your friends
+                        </li>
+                        <li>
+                            <a href="/cssslider"><code>/cssslider</code></a> - control how much
+                            styling is applied to a page with a single slider
+                        </li>
+                    </ul>
+                </article>
+                <!-- emmet: article.card>(h2)+p+ul>(li)*5 -->
+                <article class="card">
+                    <h2>Themes:</h2>
+                    <p>Use some different themes for this page</p>
+                    <ul>
+                        <li>
+                            <a href="/"><code>no theme</code></a> default setting
+                        </li>
+                        <li>
+                            <a href="?theme=material"><code>material</code></a> - some material
+                            theme
+                        </li>
+                        <li>
+                            <a href="?theme=blocky"><code>blocky</code></a> - add some dimension to
+                            this page
+                        </li>
+                        <li>
+                            <a href="?theme=blank"><code>no css</code></a> - no css
+                        </li>
+                        <li>
+                            <a href=""><code></code></a>
+                        </li>
+                    </ul>
+                </article>
+                <article class="card">
+                    <h2>About this site</h2>
+                    <p>
+                        Fun, or technical facts and tidbits about
+                        <a href="/">bulmenisaurus.github.io</a>. This site was created on
+                        <a href="https://git.io/J3MGq">Sep 1, 2020</a>, hosted on
+                        <a href="https://pages.github.com/">GitHub Pages</a>, and coded in
+                        <a href="https://www.typescriptlang.org/">TypeScript</a> and
+                        <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"
+                            >JavaScript</a
+                        >. Styled in
+                        <a href="https://sass-lang.com/" class="sassy-logo">Sass</a> and plain old
+                        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS">CSS</a>.
+                        <br /><br />
+                        It was last updated <span class="js-last-updated">50 years</span> ago.
+                    </p>
+                </article>
+            </div>
+        </main>
+        <div id="my-modal" class="modal" aria-modal="true" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span id="close">&times;</span>
+                    <h2>A free easter egg!</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Hey! Niceee, you got an easter egg! Here it is: 🥚</p>
+                    <p>I forgot to paint it though, so maybe ignore that, ok?</p>
+                </div>
+                <div class="modal-footer">
+                    &#8203;id: free_egg &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                        id="very-hidden"
+                        class="hidden"
+                    >
+                        Why would you ever look here? i&#8203;d: too_kool</span
+                    >
+                </div>
+            </div>
+        </div>
+        <footer>
+            <hr />
+            <div class="theme-container">
+                <label>
+                    <input type="checkbox" name="theme-toggle" class="theme-toggle" />
+                    <span class="theme-emoji no-select">☀️</span>
+                </label>
+            </div>
+            <a
+                href="https://github.com/Bulmenisaurus/bulmenisaurus.github.io"
+                target="_blank"
+                rel="noopener"
+            >
+                <img
+                    src="assets/images/GitHub-Mark/PNG/GitHub-Mark-120px-plus.png"
+                    alt="github"
+                    height="80"
+                    width="80"
+                />
+            </a>
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Create simple, free Valentine cards</title>
+        <meta
+            name="description"
+            content="Create simple, free valentines cards in minutes and in only 3 simple steps!"
+        />
+
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+        <meta property="og:title" content="Card creator!" />
+        <meta
+            property="og:description"
+            content="Easily create free valentine cards in minutes with only 3 easy steps!"
+        />
+        <meta
+            property="og:image"
+            content="https://bulmenisaurus.github.io/assets/images/preview-image-correct-aspect.png"
+        />
+        <meta property="og:url" content="http://bulmenisaurus.github.io/store" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+
+        <meta property="og:site_name" content="Card creator - bulmenisaurus.github.io" />
+        <meta
+            name="twitter:image:alt"
+            content="A beautiful painting with a fox and a bear sitting together, with text underneath."
+        />
+
+        <script src="dist/store.js" defer></script>
+        <link rel="stylesheet" href="dist/store.min.css" />
+        <link
+            rel="icon"
+            type="image/png"
+            href="https://bulmenisaurus.github.io/assets/images/favicon.png"
+        />
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap"
+            rel="stylesheet"
+        />
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-178719317-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-178719317-1');
+        </script>
+        <!--
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'none'; child-src 'none'; object-src 'none';  font-src https://bulmenisaurus.github.io https://fonts.gstatic.com; style-src https://bulmenisaurus.github.io 'sha256-2aahydUs+he2AO0g7YZuG67RGvfE9VXGbycVgIwMnBI=' https://fonts.googleapis.com/; img-src https://bulmenisaurus.github.io https://www.google-analytics.com https://www.facebook.com https://www.paypalobjects.com https://www.paypal.com; script-src-elem https:; script-src https:; base-uri 'none'; connect-src https:; form-action https:; frame-src https://bulmenisaurus.github.io https://www.facebook.com"
+        />
+        -->
+    </head>
+
+    <body>
+        <div id="fb-root"></div>
+        <script
+            async
+            defer
+            crossorigin="anonymous"
+            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v9.0&appId=410278500222320&autoLogAppEvents=1"
+            nonce="ANkqPbI5"
+        ></script>
+
+        <header>
+            <noscript class="error">Please enable JavaScript to make this page work!</noscript>
+            <h1>Make cards for friends, family, or youself! (for free)</h1>
+            <p id="header-description">
+                Check us out on <a href="https://www.facebook.com/siakina2021">facebook</a>!
+            </p>
+        </header>
+        <main>
+            <form action="/storeresult" id="card-form">
+                <ol>
+                    <li>
+                        <p class="step">Choose the Image:</p>
+                        <section id="image-container">
+                            <!-- TODO: https://developer.mozilla.org/en-US/docs/Web/Performance/Lazy_loading? -->
+                            <div class="group">
+                                <label>
+                                    <!--<span id="winner">1st place winner!</span>-->
+                                    <input type="radio" name="h" value="9" checked autofocus />
+                                    <img
+                                        src="assets/images/store_9.gif"
+                                        height="185"
+                                        width="300"
+                                        id="snakegif"
+                                        alt="A gif of a blocky snake"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <!-- Labels mean that people can click the images to trigger the radiobutton! -->
+                                    <input type="radio" name="h" value="1" />
+                                    <img
+                                        src="assets/images/store_1.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="A painting of a fox and a bear"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <input type="radio" name="h" value="2" />
+                                    <img
+                                        src="assets/images/store_2.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="A butterfly perched on a leaf"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <input type="radio" name="h" value="3" />
+                                    <img
+                                        src="assets/images/store_3.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="Two lemurs hanging out"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <input type="radio" name="h" value="4" />
+                                    <img
+                                        src="assets/images/store_4.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="A rooster and a white hen"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <input type="radio" name="h" value="5" />
+                                    <img
+                                        src="assets/images/store_5.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="A seagull in midair"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <input type="radio" name="h" value="6" />
+                                    <img
+                                        src="assets/images/store_6.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="A silhouette of 2 dandylions"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <input type="radio" name="h" value="7" />
+                                    <img
+                                        src="assets/images/store_7.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="A painting of a happy cat with flowers"
+                                    />
+                                </label>
+                            </div>
+                            <div class="group">
+                                <label>
+                                    <input type="radio" name="h" value="8" />
+                                    <img
+                                        src="assets/images/store_8.jpg"
+                                        height="185"
+                                        width="300"
+                                        alt="A snowman cut in half"
+                                    />
+                                </label>
+                            </div>
+                            <!-- TODO: add GIF picker from some place-->
+                        </section>
+                    </li>
+
+                    <li>
+                        <p class="step">
+                            <label for="text"
+                                >Write a message to your recipient: <span id="chars-left"></span
+                            ></label>
+                        </p>
+                        <textarea name="t" id="text" cols="40" rows="7" maxlength="150">
+Happy valentines day!</textarea
+                        >
+                        <input type="button" value="Preview!" id="open-preview" class="grey" />
+                    </li>
+
+                    <li>
+                        <p class="step">
+                            All finished! Copy the text below and send it to your friends or family!
+                        </p>
+                        <div id="link-preview">
+                            https://bulmenisaurus.github.io/storeresult?h=1&t=
+                        </div>
+                        <!-- If you're wondering wtf is going on here, I'm creating and invisible <input> -->
+                        <!-- because JS can only copy text from inputs, and not span elements. What a terrible mess -->
+                        <input type="text" id="copy-link-input" aria-hidden="true" tabindex="-1" />
+                        <input type="button" value="Copy" id="copy-link" class="blue" />
+                    </li>
+                </ol>
+            </form>
+        </main>
+        <div class="modal" id="modal-preview" aria-modal="true" aria-hidden="true" role="dialog">
+            <button class="close" id="close-preview" aria-label="close" tabindex="0">
+                &times;
+            </button>
+            <!-- TODO: Make it so when the modal is open the button above is the only selectable element -->
+            <iframe
+                src="https://bulmenisaurus.github.io/storeresult?hide=true&h=1"
+                frameborder="0"
+                id="preview-iframe"
+                title="Preview your postcard!"
+            ></iframe>
+        </div>
+
+        <footer>
+            <form
+                action="https://www.paypal.com/donate"
+                method="post"
+                target="_top"
+                class="v-align"
+            >
+                <input type="hidden" name="business" value="JN7G57MHGTW58" />
+                <input type="hidden" name="currency_code" value="USD" />
+                <input
+                    type="image"
+                    src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif"
+                    border="0"
+                    name="submit"
+                    title="PayPal - The safer, easier way to pay online!"
+                    alt="Donate with PayPal button"
+                />
+                <img
+                    alt=""
+                    border="0"
+                    src="https://www.paypal.com/en_US/i/scr/pixel.gif"
+                    width="1"
+                    height="1"
+                />
+            </form>
+            <div
+                class="fb-like"
+                data-href="https://www.facebook.com/Free-love-letters-and-pictures-103414208384146"
+                data-width="400"
+                data-layout="standard"
+                data-action="like"
+                data-size="small"
+                data-share="true"
+            ></div>
+            <br />
+            <footer-copyright
+                >Copyright 2020 - 2021 &copy;
+                <a href="https://bulmenisaurus.github.io" class="subtle-link"
+                    >bulmenisaurus.github.io</a
+                ></footer-copyright
+            >
+        </footer>
+    </body>
+</html>

@@ -1,0 +1,19 @@
+@mixin no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@mixin super-centered($use-grid: true) {
+    @if $use-grid {
+        display: grid;
+        place-items: center;
+    } @else {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

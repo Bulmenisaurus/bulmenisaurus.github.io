@@ -1,0 +1,29 @@
+{
+  "name": "bulmenisaurus.github.io",
+  "version": "1.0.0",
+  "description": "My site",
+  "main": "index.js",
+  "dependencies": {
+    "eslint": "^7.26.0",
+    "prettier": "^2.4.0",
+    "typescript": "^4.2.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write .",
+    "build": "tsc",
+    "build:watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bulmenisaurus/bulmenisaurus.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bulmenisaurus/bulmenisaurus.github.io/issues"
+  },
+  "homepage": "https://bulmenisaurus.github.io"
+}
