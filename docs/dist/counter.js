@@ -80,3 +80,4 @@ setInterval(() => {
 window.addEventListener('beforeunload', () => {
     localStorage.setItem('counter', count.toString());
 });
+//# sourceMappingURL=counter.js.map

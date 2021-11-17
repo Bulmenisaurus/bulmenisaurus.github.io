@@ -16,3 +16,4 @@ document.title = window.location.pathname.slice(1).split('/').pop().replace('-',
     ];
     document.body.append(frame);
 })();
+//# sourceMappingURL=404-alternate.js.map

@@ -39,3 +39,4 @@ if (quoteElem) {
         quoteElem.innerText = randomQuote.text + '\n\n - ' + randomQuote.author;
     });
 }
+//# sourceMappingURL=run.js.map

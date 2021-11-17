@@ -18,3 +18,4 @@ document.addEventListener('click', () => {
     video.autoplay = true;
 });
 window.onbeforeunload = () => '';
+//# sourceMappingURL=rickroll.js.map

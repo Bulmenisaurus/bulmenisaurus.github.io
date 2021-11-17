@@ -338,3 +338,4 @@ class Game {
     }
 }
 const snakeGame = new Game(GameData);
+//# sourceMappingURL=snake.js.map

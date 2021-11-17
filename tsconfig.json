@@ -4,6 +4,7 @@
     "noImplicitAny": true,
     "alwaysStrict": true,
     "strict": true,
-    "outDir": "docs/dist"
+    "outDir": "docs/dist",
+    "sourceMap": true
   }
 }
