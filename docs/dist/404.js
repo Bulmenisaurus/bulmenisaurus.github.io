@@ -34,7 +34,7 @@ if (messageElem)
     messageElem.innerText = messages[urlHash];
 const repositoryFile = (owner, repo) => __awaiter(void 0, void 0, void 0, function* () {
     // https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
-    const repsonse = yield fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/master?recursive=1`);
+    const repsonse = yield fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);
     return repsonse.json();
 });
 // https://stackoverflow.com/a/36566052/13996389
