@@ -55,7 +55,7 @@ interface GithubTree {
 const repositoryFile = async (owner: string, repo: string) => {
     // https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
     const repsonse = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/git/trees/master?recursive=1`
+        `https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`
     );
     return <Promise<GithubTree>>repsonse.json();
 };

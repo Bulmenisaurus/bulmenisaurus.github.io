@@ -126,7 +126,7 @@ fetch('https://api.github.com/repos/Bulmenisaurus/bulmenisaurus.github.io/langua
         scssSize.innerText = cssAmount.toFixed(2).toString();
     });
 
-fetch('https://api.github.com/repos/bulmenisaurus/bulmenisaurus.github.io/commits/master')
+fetch('https://api.github.com/repos/bulmenisaurus/bulmenisaurus.github.io/commits/main')
     .then((response) => response.json())
     .then((data) => {
         console.log(data);
