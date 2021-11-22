@@ -99,7 +99,7 @@ const generate = (seed) => {
 const copyButton = document.getElementById('copy');
 const generateButton = document.getElementById('generate');
 copyButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-    yield window.navigator.clipboard.writeText(document.getElementById('logo-container').outerHTML);
+    yield window.navigator.clipboard.writeText(document.getElementsByTagName('svg')[0].outerHTML);
 }));
 generateButton.addEventListener('click', () => {
     const newSeed = Math.floor(Math.random() * 10000);

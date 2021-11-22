@@ -125,9 +125,7 @@ const copyButton = document.getElementById('copy') as HTMLButtonElement;
 const generateButton = document.getElementById('generate') as HTMLButtonElement;
 
 copyButton.addEventListener('click', async () => {
-    await window.navigator.clipboard.writeText(
-        document.getElementById('logo-container')!.outerHTML
-    );
+    await window.navigator.clipboard.writeText(document.getElementsByTagName('svg')[0].outerHTML);
 });
 
 generateButton.addEventListener('click', () => {
