@@ -1,0 +1,636 @@
+<!-- more than anything, this page is just to see how much can be done in a single html file -->
+<!-- (counterbalancing React + JSX + Parcel + 100s of MB of node_modules)-->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="shortcut icon"
+            href="./assets/images/terminal-favicon.svg"
+            type="image/svg+xml"
+        />
+        <!-- "Javascript Shell ;)" -->
+        <title>JS</title>
+
+        <style>
+            pre code.hljs {
+                display: block;
+                overflow-x: auto;
+            }
+            .hljs {
+                color: #abb2bf;
+            }
+            .hljs-comment,
+            .hljs-quote {
+                color: #5c6370;
+                font-style: italic;
+            }
+            .hljs-doctag,
+            .hljs-formula,
+            .hljs-keyword {
+                color: #c678dd;
+            }
+            .hljs-deletion,
+            .hljs-name,
+            .hljs-section,
+            .hljs-selector-tag,
+            .hljs-subst {
+                color: #e06c75;
+            }
+            .hljs-literal {
+                color: #56b6c2;
+            }
+            .hljs-addition,
+            .hljs-attribute,
+            .hljs-meta .hljs-string,
+            .hljs-regexp,
+            .hljs-string {
+                color: #98c379;
+            }
+            .hljs-attr,
+            .hljs-number,
+            .hljs-selector-attr,
+            .hljs-selector-class,
+            .hljs-selector-pseudo,
+            .hljs-template-variable,
+            .hljs-type,
+            .hljs-variable {
+                color: #d19a66;
+            }
+            .hljs-bullet,
+            .hljs-link,
+            .hljs-meta,
+            .hljs-selector-id,
+            .hljs-symbol,
+            .hljs-title {
+                color: #61aeee;
+            }
+            .hljs-built_in,
+            .hljs-class .hljs-title,
+            .hljs-title.class_ {
+                color: #e6c07b;
+            }
+            .hljs-emphasis {
+                font-style: italic;
+            }
+            .hljs-strong {
+                font-weight: 700;
+            }
+            .hljs-link {
+                text-decoration: underline;
+            }
+        </style>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+
+        <!-- Fira Code -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            *::-webkit-scrollbar {
+                display: none;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                background-color: rgb(40, 50, 55);
+                color: rgb(200, 200, 200);
+                font-family: 'Fira code', 'Fira Mono', monospace;
+                padding: 0.75em;
+                min-height: 100vh;
+            }
+
+            pre {
+                white-space: pre-wrap; /* css-3 */
+                white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+                white-space: -pre-wrap; /* Opera 4-6 */
+                white-space: -o-pre-wrap; /* Opera 7 */
+                word-wrap: break-word; /* Internet Explorer 5.5+ */
+                font-family: 'Fira code', 'Fira Mono', monospace;
+            }
+
+            code {
+                font-family: 'Fira code', 'Fira Mono', monospace;
+            }
+
+            ::selection {
+                background-color: rgb(102, 124, 137);
+                color: rgb(200, 200, 200);
+            }
+
+            #terminal {
+                white-space: pre-wrap;
+                min-height: 100%;
+                font-size: 0.8rem;
+            }
+
+            #terminal .prompt {
+                color: rgb(180, 250, 230);
+            }
+
+            #terminal input.input-content {
+                border: none;
+                background: none;
+                color: inherit;
+                font: inherit;
+                outline: none;
+                line-height: 1em;
+                padding: 0;
+                margin: 0;
+            }
+
+            #terminal .color-2 {
+                color: rgb(150, 200, 250);
+            }
+
+            #terminal .comment {
+                color: #6272a4;
+            }
+        </style>
+        <script>
+            window.addEventListener('DOMContentLoaded', async () => {
+                /**
+                 * ! Array.prototype.at polyfill!!!
+                 * ! https://github.com/tc39/proposal-relative-indexing-method#polyfill
+                 *
+                 * @param n {number}
+                 */
+                function at(n) {
+                    // ToInteger() abstract op
+                    n = Math.trunc(n) || 0;
+                    // Allow negative indexing from the end
+                    if (n < 0) n += this.length;
+                    // OOB access is guaranteed to return undefined
+                    if (n < 0 || n >= this.length) return undefined;
+                    // Otherwise, this is just normal property access
+                    return this[n];
+                }
+
+                const TypedArray = Reflect.getPrototypeOf(Int8Array);
+                for (const C of [Array, String, TypedArray]) {
+                    Object.defineProperty(C.prototype, 'at', {
+                        value: at,
+                        writable: true,
+                        enumerable: false,
+                        configurable: true,
+                    });
+                }
+
+                /***
+                 * returns a promise that finishes after a certain delay
+                 */
+                const wait = (delay) => {
+                    return new Promise((res) => {
+                        setTimeout(() => {
+                            res(delay);
+                        }, delay);
+                    });
+                };
+
+                /**
+                 * escapes html tags with safe alternatives
+                 * @param unsafe {string}
+                 */
+                const escapeHtml = (unsafe) => {
+                    return unsafe
+                        .replaceAll('&', '&amp;')
+                        .replaceAll('<', '&lt;')
+                        .replaceAll('>', '&gt;')
+                        .replaceAll('"', '&quot;')
+                        .replaceAll("'", '&#039;');
+                };
+
+                /**
+                 * Fetch that uses cached values instead of fetching every time
+                 * @param url {string}
+                 * @param options {Object.<string, any>}
+                 */
+                const cachedFetch = async (url, options) => {
+                    // Use the URL as the cache key to sessionStorage
+                    let cacheKey = url;
+
+                    let cached = sessionStorage.getItem(cacheKey);
+                    if (cached !== null) {
+                        // it was in sessionStorage! Yay!
+                        let response = new Response(new Blob([cached]));
+                        return Promise.resolve(response);
+                    }
+
+                    const response = await fetch(url, options);
+                    // let's only store in cache if the content-type is
+                    // JSON or something non-binary
+                    if (response.status === 200) {
+                        let ct = response.headers.get('Content-Type');
+                        if (ct && (ct.match(/application\/json/i) || ct.match(/text\//i))) {
+                            // There is a .json() instead of .text() but
+                            // we're going to store it in sessionStorage as
+                            // string anyway.
+                            // If we don't clone the response, it will be
+                            // consumed by the time it's returned. This
+                            // way we're being un-intrusive.
+                            sessionStorage.setItem(cacheKey, await response.clone().text());
+                        }
+                    }
+                    return response;
+                };
+
+                /**
+                 * fetches the contents of the `docs/` folder in the github repository
+                 * @returns {Promise<{path: string, mode: string, type: "blob" | "tree", url: string}[]>}
+                 */
+                const srcFolder = async () => {
+                    let response = await cachedFetch(
+                        'https://api.github.com/repos/Bulmenisaurus/bulmenisaurus.github.io/git/trees/main'
+                    );
+
+                    const tree = (await response.json()).tree;
+                    const docsFolderURl = tree.find((file) => file.path === 'docs').url;
+
+                    response = await cachedFetch(docsFolderURl);
+
+                    const docsTree = (await response.json()).tree;
+
+                    return docsTree;
+                };
+
+                /**
+                 * Gets the files at a certain path
+                 * @param path {string}
+                 * @param rootDir {Promise<{path: string, mode: string, type: "blob" | "tree", url: string}[]>}
+                 * @returns {{path: string, mode: string, type: "blob" | "tree", url: string} | undefined}
+                 */
+                const getFile = async (path, rootDir) => {
+                    const folder = rootDir.find((f) => f.path === path);
+
+                    return folder;
+                };
+
+                /**
+                 * The list of commands that can be executed
+                 * @type {Object.<string, {execute: (terminal: Terminal, output: HTMLDivElement, commandArguments: string[]) => void}>}
+                 *
+                 */
+                const COMMANDS = {
+                    echo: {
+                        execute: async (terminal, output, commandArguments) => {
+                            output.innerText = commandArguments.join(' ') || '\n';
+                        },
+                    },
+                    commandNotFound: {
+                        execute: async (terminal, output, commandArguments) => {
+                            output.innerText = `command not found: ${commandArguments[0]}`;
+                        },
+                    },
+                    ls: {
+                        execute: async (terminal, output, commandArguments) => {
+                            const files = terminal.rootDirs.at(-1);
+                            (await files).map((file) => {
+                                const fileText = document.createElement('div');
+
+                                fileText.classList.add(
+                                    file.type === 'blob' ? 'color-1' : 'color-2'
+                                );
+
+                                fileText.innerText = file.path;
+
+                                if (file.type === 'tree') {
+                                    fileText.innerText += '/';
+                                }
+
+                                output.appendChild(fileText);
+                            });
+                        },
+                    },
+                    cat: {
+                        execute: async (terminal, output, commandArguments) => {
+                            const files = await terminal.rootDirs.at(-1);
+
+                            if (!commandArguments[0]) {
+                                output.innerText = 'Pls provide file';
+                                return;
+                            }
+
+                            const file = files.find((f) => f.path === commandArguments[0]);
+
+                            if (!file) {
+                                output.innerText = `${commandArguments[0]}: No such file or directory`;
+                                return;
+                            }
+
+                            if (file.type !== 'blob') {
+                                output.innerText = `${commandArguments[0]}: Is a directory`;
+                                return;
+                            }
+
+                            const response = await cachedFetch(file.url);
+                            const fileContents = await response.json();
+                            // syntax highlighting
+                            // this took infuriatingly long to do right
+                            // (like 3 hours)
+                            // seems like hljs can only highlight inline elements (it likes line breaks, not <br>'s)
+                            // I don't even care anymore about .innerHtml
+                            // may no poor soul touch this code ever again
+
+                            output.innerHTML = `<pre><code>${escapeHtml(
+                                atob(fileContents.content)
+                            )}</code></pre>`;
+
+                            hljs.highlightElement(output.children[0].children[0]);
+                        },
+                    },
+                    clear: {
+                        execute: async (terminal, output, commandArguments) => {
+                            output.remove();
+
+                            const terminalContainer = document.getElementById('terminal');
+
+                            while (terminalContainer.firstChild) {
+                                terminalContainer.firstChild.remove();
+                            }
+                        },
+                    },
+                    open: {
+                        execute: async (terminal, output, commandArguments) => {
+                            const path = commandArguments[0] ?? '';
+
+                            const url = `https://bulmenisaurus.github.io${terminal.path.join(
+                                '/'
+                            )}/${path}`;
+
+                            output.innerText = 'Redirecting to ';
+
+                            const urlText = document.createElement('span');
+                            urlText.innerText = url;
+                            urlText.style.textDecoration = 'underline';
+
+                            output.appendChild(urlText);
+
+                            await wait(500);
+
+                            window.location.href = url;
+                        },
+                    },
+                    rm: {
+                        execute: async (terminal, output, commandArguments) => {
+                            // wait for the `rm` command to be put onto a new line
+                            await wait(100);
+
+                            // lag for 2 seconds
+                            const start = Date.now();
+                            let now = start;
+
+                            while (now - start < 3000) {
+                                now = Date.now();
+                            }
+
+                            document.body.style.backgroundColor = 'black';
+                            while (document.body.firstChild) {
+                                document.body.firstChild.remove();
+                            }
+
+                            await wait(2000);
+
+                            const audio = new Audio('./assets/audio/audio.mp3');
+                            await audio.play();
+
+                            await wait(4500);
+
+                            window.location.reload();
+                        },
+                    },
+                    pwd: {
+                        execute: async (terminal, output, commandArguments) => {
+                            output.innerText = '~' + terminal.path.join('/');
+                        },
+                    },
+                    // i have spent way to much time mistakenly debugging this when I was making typos...
+                    cd: {
+                        execute: async (terminal, output, commandArguments) => {
+                            let pathArg = commandArguments[0];
+
+                            if (!pathArg) {
+                                terminal.path = [''];
+                                terminal.rootDirs = [terminal.rootDirs[0]];
+                                return;
+                            }
+
+                            let path = pathArg.split('/')[0];
+
+                            if (path.endsWith('/')) {
+                                path = path.slice(0, path.length - 1);
+                            }
+
+                            if (path === '..') {
+                                if (terminal.path.length > 1) {
+                                    terminal.path.pop();
+                                    terminal.rootDirs.pop();
+                                }
+                                return;
+                            } else if (path === '.') {
+                                return;
+                            } else {
+                                const folder = await getFile(path, await terminal.rootDirs.at(-1));
+
+                                if (!folder) {
+                                    output.innerText = `${commandArguments[0]}: no such file or directory`;
+                                    return;
+                                }
+
+                                if (folder.type !== 'tree') {
+                                    output.innerText = `${commandArguments[0]}: not a directory`;
+                                    return;
+                                }
+
+                                const directory = await cachedFetch(folder.url);
+                                const tree = (await directory.json()).tree;
+
+                                terminal.rootDirs.push(tree);
+                                terminal.path.push(path);
+                            }
+                        },
+                    },
+                    sleep: {
+                        execute: async (terminal, output, commandArguments) => {
+                            const sleepAmount = commandArguments[0];
+
+                            if (sleepAmount === undefined) {
+                                output.innerText = `usage: sleep [seconds]`;
+                            } else if (isNaN(parseFloat(sleepAmount))) {
+                                const glitch = () => {
+                                    output.innerText = `waiting for: ${Array(20)
+                                        .fill(() => '0123456789'[Math.floor(Math.random() * 10)])
+                                        .map((l) => l())
+                                        .join('')} seconds`;
+
+                                    setTimeout(glitch, 50);
+                                };
+
+                                glitch();
+                                await wait(100_000);
+                            } else {
+                                await wait(parseFloat(sleepAmount) * 1000);
+                            }
+                        },
+                    },
+                };
+
+                class Terminal {
+                    constructor() {
+                        this.terminalElement = document.getElementById('terminal');
+                        this.shouldTakeInput = false;
+                        this.path = [''];
+                        /**
+                         * @type {Promise<{path: string, mode: string, type: "blob" | "tree", url: string}[]>[]}
+                         */
+                        this.rootDirs = [srcFolder()];
+                    }
+
+                    get prompt() {
+                        const lastPath = this.path.at(-1);
+
+                        if (lastPath === '') {
+                            return '~ ';
+                        } else {
+                            return lastPath + ' ';
+                        }
+                    }
+
+                    /**
+                     * Appends a comment to the terminal
+                     * @param comment {string}
+                     */
+                    comment(comment) {
+                        const commentText = document.createElement('div');
+
+                        commentText.innerText = comment
+                            .split('\n')
+                            .map((c) => '# ' + c)
+                            .join('\n');
+
+                        commentText.classList.add('comment');
+
+                        this.terminalElement.appendChild(commentText);
+
+                        return this;
+                    }
+
+                    /**
+                     * Appends an input and a prompt to the terminal
+                     * @param options {Object}
+                     * @param options.recursive {boolean}
+                     */
+                    takeInput({ recursive }) {
+                        const commandInputText = document.createElement('div');
+                        commandInputText.classList.add('command-input');
+
+                        this.terminalElement.appendChild(commandInputText);
+
+                        const prompt = document.createElement('span');
+                        prompt.classList.add('prompt');
+                        prompt.innerText = this.prompt;
+
+                        const inputContent = document.createElement('input');
+                        inputContent.classList.add('input-content');
+
+                        commandInputText.appendChild(prompt);
+                        commandInputText.appendChild(inputContent);
+
+                        inputContent.focus();
+                        // scrolls allll the way to the bottom, so you can see the padding-bottom of the <body>
+                        inputContent.scrollIntoView(false);
+
+                        const handler = async (e) => {
+                            if (e.key === 'Enter') {
+                                // append command to localStorage
+                                if (localStorage.getItem('commands')) {
+                                    const commands = JSON.parse(localStorage.getItem('commands'));
+
+                                    commands.push(inputContent.value);
+
+                                    localStorage.setItem('commands', JSON.stringify(commands));
+                                } else {
+                                    localStorage.setItem(
+                                        'commands',
+                                        JSON.stringify([inputContent.value])
+                                    );
+                                }
+
+                                // user has submitted command
+                                const writtenContent = document.createElement('span');
+                                writtenContent.innerText = inputContent.value;
+
+                                const commandOutput = document.createElement('pre');
+                                this.terminalElement.appendChild(commandOutput);
+                                inputContent.remove();
+                                commandInputText.appendChild(writtenContent);
+
+                                await this.handleCommand(commandOutput, inputContent.value);
+
+                                // just in case...
+                                inputContent.removeEventListener('keydown', handler);
+
+                                if (recursive) this.takeInput({ recursive: true });
+                            }
+                        };
+
+                        inputContent.addEventListener('keydown', handler);
+                    }
+
+                    /**
+                     * Executes and returns output for a command
+                     * @param output {HTMLDivElement}
+                     * @param command {string}
+                     */
+                    async handleCommand(output, command) {
+                        const args = command.trim().split(/ +/);
+
+                        // ignore sudo
+                        if (args[0] === 'sudo') {
+                            args.shift();
+
+                            if (args.length === 0) {
+                                output.innerText = 'ಠ_ಠ';
+                                return;
+                            }
+                        }
+
+                        const commandName = args.shift()?.toLowerCase();
+
+                        // no command provided
+                        if (commandName === '') {
+                            return;
+                        }
+
+                        if (COMMANDS.hasOwnProperty(commandName)) {
+                            // execute the command if it exists
+                            await COMMANDS[commandName].execute(this, output, args);
+                        } else {
+                            // otherwise, inform the user that the command doesn't exist
+                            await COMMANDS.commandNotFound.execute(this, output, [commandName]);
+                        }
+                    }
+                }
+
+                new Terminal()
+                    .comment('This is a custom (although primitive) shell!')
+                    .comment('Try running the commands `ls` or `echo Hello, World`')
+                    .comment('`cat`, `cd`, `clear`, `sleep` and `open` are supported too')
+                    .takeInput({ recursive: true });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="terminal"></div>
+    </body>
+</html>
