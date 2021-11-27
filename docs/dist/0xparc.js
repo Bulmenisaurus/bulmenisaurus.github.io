@@ -8,12 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-// https://stackoverflow.com/a/19303725/13996389
-const seededRandom = (seed) => {
-    return Math.sin(seed * 1000) / 2 + 0.5;
-};
 const coordinateDistance = (a, b) => {
-    return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.x) ** 2);
+    return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 };
 class SvgDrawer {
     constructor() {
@@ -36,20 +32,45 @@ class SvgDrawer {
         return this._svgElement;
     }
 }
+class RandomGenerator {
+    // https://stackoverflow.com/a/19301306/13996389
+    // https://stackoverflow.com/a/19303725/13996389
+    // (math.sin) was giving weird patterns, this one seems more random
+    constructor() {
+        this.m_w = 123456789;
+        this.m_z = 987654321;
+        this.mask = 0xffffffff;
+        return this;
+    }
+    // Takes any integer
+    setSeed(i) {
+        this.m_w = (123456789 + i) & this.mask;
+        this.m_z = (987654321 - i) & this.mask;
+        return this;
+    }
+    // Returns number between 0 (inclusive) and 1.0 (exclusive),
+    // just like Math.random().
+    // this definitely looks like it's doing something so ¯\_(ツ)_/¯
+    random() {
+        this.m_z = (36969 * (this.m_z & 65535) + (this.m_z >> 16)) & this.mask;
+        this.m_w = (18000 * (this.m_w & 65535) + (this.m_w >> 16)) & this.mask;
+        var result = ((this.m_z << 16) + (this.m_w & 65535)) >>> 0;
+        result /= 4294967296;
+        return result;
+    }
+}
 class LogoGenerator {
     constructor(seed) {
         this.logo = new SvgDrawer();
-        this.seed = seed;
+        this.randomGenerator = new RandomGenerator().setSeed(seed);
     }
     random() {
-        const res = seededRandom(this.seed);
-        this.seed++;
-        return res;
+        return this.randomGenerator.random();
     }
     create() {
         const amountOfLines = Math.floor(this.random() * 6) + 4;
         for (let i = 0; i < amountOfLines; i++) {
-            this.randomLine(20, 50);
+            this.randomLine(20, 80);
         }
         return this.logo.svg;
     }
@@ -70,12 +91,16 @@ class LogoGenerator {
         };
     }
     randomLine(minLength, maxLength) {
-        const firstPoint = this.randomPoint();
         let point2 = this.randomPoint();
-        do {
+        const firstPoint = this.randomPoint();
+        while (
+        // continue running while the line is either shorter than the min length
+        // OR
+        // longer than the max length
+        coordinateDistance(firstPoint, point2) <= minLength ||
+            coordinateDistance(firstPoint, point2) >= maxLength) {
             point2 = this.randomPoint();
-        } while (minLength <= coordinateDistance(firstPoint, point2) &&
-            coordinateDistance(firstPoint, point2) <= maxLength);
+        }
         this.logo.createLine(firstPoint.x, firstPoint.y, point2.x, point2.y, this.randomColor());
     }
 }
