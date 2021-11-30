@@ -4,7 +4,6 @@ class ThemeChanger {
     theme: string;
     themeTrigger: HTMLInputElement;
     onThemeChange: ((theme: string) => any) | undefined;
-    // Made this a class so I can use it in other files this is probably bad  ̅\_🤓_/ ̅
     constructor(themeTrigger: HTMLInputElement) {
         this.theme = this.getTheme();
         this.themeTrigger = themeTrigger;
@@ -26,7 +25,9 @@ class ThemeChanger {
             this.onThemeChange(this.theme);
         }
         this.setTheme(this.theme);
-        this.themeTrigger.onclick = () => this.toggleTheme.bind(this);
+        this.themeTrigger.addEventListener('click', () => {
+            this.toggleTheme(true);
+        });
     }
 
     toggleTheme(withTransition = false) {

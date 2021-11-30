@@ -4,10 +4,10 @@ const themes = new ThemeChanger(themeTrigger);
 themes.onThemeChange = (theme) => {
     const githubImage = document.querySelector('footer a img');
     if (theme === 'light') {
-        githubImage.src = 'assets/images/GitHub-Mark/PNG/GitHub-Mark-120px-plus.png';
+        githubImage.src = '../assets/images/GitHub-Mark/PNG/GitHub-Mark-120px-plus.png';
     }
     else {
-        githubImage.src = 'assets/images/GitHub-Mark/PNG/GitHub-Mark-Light-120px-plus.png';
+        githubImage.src = '../assets/images/GitHub-Mark/PNG/GitHub-Mark-Light-120px-plus.png';
     }
 };
 themes.init();
@@ -15,16 +15,15 @@ const url = new URL(window.location.toString());
 const urlParams = new URLSearchParams(url.search);
 const theme = urlParams.get('theme');
 if (theme) {
-    const themeUrl = `dist/style.${theme}.min.css`;
+    const themeUrl = `../dist/${theme}.min.css`;
     const styleSheet = document.getElementsByClassName('js-dynamic-css')[0];
     styleSheet.href = themeUrl;
 }
 else {
     const themes = [...Array(5).fill('style'), 'style.blank', 'style.blocky', 'style.material'];
-    const randomTheme = `dist/${themes[Math.floor(Math.random() * themes.length) - 1]}.min.css`;
+    const randomTheme = `../dist/${themes[Math.floor(Math.random() * themes.length) - 1]}.min.css`;
     const dynamicStyles = document.getElementsByClassName('js-dynamic-css')[0];
     dynamicStyles.href = randomTheme;
-    console.log({ randomTheme });
 }
 (() => {
     const woah = document.getElementById('t3');
@@ -62,29 +61,6 @@ console.log('%cHey! Stop peeking down here! Easter eggs are too easy....\nid: pe
   font-size: 14px;
   font-family:"Lucida Console", Monaco, monospace;
 `);
-const openModal = document.getElementById('easter-egg');
-const modal = document.getElementById('my-modal');
-const closeModal = document.getElementById('close');
-openModal.onclick = function () {
-    modal.style.display = 'block';
-    modal.setAttribute('aria-hidden', 'false');
-};
-closeModal.onclick = function () {
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden', 'true');
-};
-window.onclick = function (e) {
-    if (e.target === modal) {
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-    }
-};
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-    }
-});
 const msToTime = (ms) => {
     const seconds = Math.round(ms / 1000);
     const minutes = Math.round(ms / (1000 * 60));
@@ -116,7 +92,6 @@ fetch('https://api.github.com/repos/Bulmenisaurus/bulmenisaurus.github.io/langua
 fetch('https://api.github.com/repos/bulmenisaurus/bulmenisaurus.github.io/commits/main')
     .then((response) => response.json())
     .then((data) => {
-    console.log(data);
     const commitDate = new Date(data['commit']['committer']['date']);
     const lastUpdatedDelta = new Date().getTime() - commitDate.getTime();
     const lastUpdatedReadable = msToTime(lastUpdatedDelta);

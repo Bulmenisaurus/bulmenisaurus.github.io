@@ -1,7 +1,6 @@
 "use strict";
 // ! YOINKED: https://medium.com/@haxzie/dark-and-light-theme-switcher-using-css-variables-and-pure-javascript-zocada-dd0059d72fa2
 class ThemeChanger {
-    // Made this a class so I can use it in other files this is probably bad  ̅\_🤓_/ ̅
     constructor(themeTrigger) {
         this.theme = this.getTheme();
         this.themeTrigger = themeTrigger;
@@ -20,7 +19,9 @@ class ThemeChanger {
             this.onThemeChange(this.theme);
         }
         this.setTheme(this.theme);
-        this.themeTrigger.onclick = () => this.toggleTheme.bind(this);
+        this.themeTrigger.addEventListener('click', () => {
+            this.toggleTheme(true);
+        });
     }
     toggleTheme(withTransition = false) {
         if (withTransition) {
