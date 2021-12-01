@@ -98,4 +98,4 @@ fetch('https://api.github.com/repos/bulmenisaurus/bulmenisaurus.github.io/commit
     const lastUpdated = document.querySelector('.js-last-updated');
     lastUpdated.innerText = lastUpdatedReadable;
 });
-//# sourceMappingURL=script.js.map
+//# sourceMappingURL=script-1.js.map
