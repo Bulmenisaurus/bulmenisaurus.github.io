@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const input = document.getElementsByTagName('textarea')[0];
+                const link = document.getElementsByTagName('a')[0];
+
+                input.oninput = () => {
+                    link.href = 'javascript:' + encodeURIComponent(input.value);
+                };
+            });
+        </script>
+        <textarea type="text" id="js-input"></textarea>
+        <a style="display: block" href="">JS LINK</a>
+    </body>
+</html>
