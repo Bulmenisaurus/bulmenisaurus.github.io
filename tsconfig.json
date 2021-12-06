@@ -5,6 +5,7 @@
     "alwaysStrict": true,
     "strict": true,
     "outDir": "docs/dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "moduleResolution": "node"
   }
 }
