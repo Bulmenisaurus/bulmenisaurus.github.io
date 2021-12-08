@@ -15,7 +15,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "build": "tsc",
-    "build:watch": "tsc -w"
+    "build:watch": "tsc -w",
+    "create": "sh ./create.sh"
   },
   "repository": {
     "type": "git",
