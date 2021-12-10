@@ -1,0 +1,26 @@
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* in-content-page-{color, background} for dark theme. */
+        background: rgb(28, 27, 34);
+        color: rgb(251, 251, 254);
+    }
+
+    ::selection {
+        color: black;
+        background-color: white;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: monospace;
+    white-space: pre;
+
+    min-height: 100vh;
+    cursor: none;
+}
