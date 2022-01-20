@@ -15,6 +15,7 @@ class SvgDrawer {
     constructor() {
         this._svgElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this._svgElement.setAttribute('viewBox', '0 0 100 100');
+        this._svgElement.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
         this.svgPaths = [];
     }
     createLine(x1, y1, x2, y2, color) {
