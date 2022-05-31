@@ -28,4 +28,3 @@ touch "${projectrootdir}/${name}.html"
 touch "${projectrootdir}/scripts/${name}.ts"
 touch "${projectrootdir}/stylesheets/${name}.scss"
 
-say --rate=300 "created ${name}.html, ${name}.ts, and ${name}.scss. Godspeed cadet"
