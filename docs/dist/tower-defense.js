@@ -47,6 +47,7 @@ class Bullet {
         this.angle = angle;
         this.speed = speed;
         this.startTime = startTime;
+        this.touchedIds = [];
     }
     getPosition(time) {
         const elapsedTime = time - this.startTime;
@@ -59,11 +60,12 @@ class Bullet {
 }
 //! Enemies
 class Enemy {
-    constructor(tickOffset = 0) {
+    constructor(tickOffset = 0, id) {
         this.speed = 100;
         this.tickOffset = tickOffset;
         this.gameRadius = 20;
-        this.health = 1;
+        this.health = 3;
+        this.id = id;
     }
     getPositionInformation(time, path, totalPathLength) {
         const elapsedTime = time + this.tickOffset;
@@ -96,7 +98,7 @@ class SimpleEnemy extends Enemy {
 }
 const GameEnemies = [];
 for (let i = 0; i < 10; i++) {
-    GameEnemies.push(new SimpleEnemy(-i));
+    GameEnemies.push(new SimpleEnemy(-i, i));
 }
 //! Towers
 class Tower {
@@ -188,12 +190,16 @@ const render = () => __awaiter(void 0, void 0, void 0, function* () {
         for (const bullet of GAME.gameBullets) {
             const bulletPosition = bullet.getPosition(time);
             for (const enemy of GameEnemies) {
+                if (bullet.touchedIds.includes(enemy.id)) {
+                    continue;
+                }
                 const enemyPosition = enemy.getPositionInformation(time, GAME.gamePath, GAME.totalGamePathLength);
                 if (enemyPosition === undefined)
                     continue;
                 const dist = distance(bulletPosition, enemyPosition.location);
                 if (dist <= enemy.gameRadius) {
                     enemy.health -= 1;
+                    bullet.touchedIds.push(enemy.id);
                 }
             }
         }

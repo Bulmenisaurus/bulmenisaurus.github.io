@@ -52,11 +52,13 @@ class Bullet {
     angle: number;
     speed: number;
     startTime: number;
+    touchedIds: number[];
     constructor(coordinate: Coordinate, angle: number, speed: number, startTime: number) {
         this.initialPosition = coordinate;
         this.angle = angle;
         this.speed = speed;
         this.startTime = startTime;
+        this.touchedIds = [];
     }
 
     getPosition(time: number): Coordinate {
@@ -77,11 +79,13 @@ class Enemy {
     tickOffset: number;
     gameRadius: number;
     health: number;
-    constructor(tickOffset = 0) {
+    id: number;
+    constructor(tickOffset = 0, id: number) {
         this.speed = 100;
         this.tickOffset = tickOffset;
         this.gameRadius = 20;
-        this.health = 1;
+        this.health = 3;
+        this.id = id;
     }
 
     getPositionInformation(
@@ -128,7 +132,7 @@ class SimpleEnemy extends Enemy {}
 const GameEnemies: Enemy[] = [];
 
 for (let i = 0; i < 10; i++) {
-    GameEnemies.push(new SimpleEnemy(-i));
+    GameEnemies.push(new SimpleEnemy(-i, i));
 }
 
 //! Towers
@@ -260,6 +264,10 @@ const render = async () => {
             const bulletPosition = bullet.getPosition(time);
 
             for (const enemy of GameEnemies) {
+                if (bullet.touchedIds.includes(enemy.id)) {
+                    continue;
+                }
+
                 const enemyPosition = enemy.getPositionInformation(
                     time,
                     GAME.gamePath,
@@ -271,6 +279,7 @@ const render = async () => {
 
                 if (dist <= enemy.gameRadius) {
                     enemy.health -= 1;
+                    bullet.touchedIds.push(enemy.id);
                 }
             }
         }
