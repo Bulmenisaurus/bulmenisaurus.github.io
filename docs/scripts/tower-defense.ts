@@ -84,7 +84,7 @@ class Enemy {
         this.speed = 100;
         this.tickOffset = tickOffset;
         this.gameRadius = 20;
-        this.health = 3;
+        this.health = 6;
         this.id = id;
     }
 
@@ -197,8 +197,43 @@ class Tower {
 
 class SimpleTower extends Tower {}
 
+class MultiHitTower extends Tower {
+    targetEnemies(
+        time: number,
+        enemies: Enemy[],
+        path: Path,
+        totalPathLength: number
+    ): Bullet[] | undefined {
+        this.tickCoolDown--;
+        if (this.tickCoolDown < 0) {
+            this.tickCoolDown = this.maxTickCoolDown;
+        }
+
+        if (this.tickCoolDown !== 0) {
+            return;
+        }
+
+        const enemiesInRange = this.getEnemiesInRange(time, enemies, path, totalPathLength);
+
+        if (enemiesInRange.length === 0) {
+            return;
+        }
+
+        const amountOfBullets = 6;
+        const fullCircle = Math.PI * 2;
+
+        let bullets: Bullet[] = [];
+        for (let i = 0; i < amountOfBullets; i++) {
+            let bulletAngle = (fullCircle / amountOfBullets) * i;
+            bullets.push(new Bullet(this.location, bulletAngle, 400, time));
+        }
+
+        return bullets;
+    }
+}
+
 const GameTowers: Tower[] = [
-    new SimpleTower({ x: 140, y: 250 }),
+    new MultiHitTower({ x: 450, y: 200 }),
     new SimpleTower({ x: 400, y: 250 }),
 ];
 
