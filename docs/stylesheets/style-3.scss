@@ -39,7 +39,7 @@ body {
 
 /*  CLASSES AND MAIN ELEMENTSSS */
 
-h1 {
+h1:not(:empty) {
     /*text-shadow: 0px 1px 10px #000000;*/
     font-family: 'Quicksand', 'Lucida Console', Monaco, monospace;
     font-size: calc(min(8vw, 50px));
