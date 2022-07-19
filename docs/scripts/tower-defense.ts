@@ -84,7 +84,7 @@ class Enemy {
         this.speed = 100;
         this.tickOffset = tickOffset;
         this.gameRadius = 20;
-        this.health = 6;
+        this.health = 3;
         this.id = id;
     }
 
@@ -145,7 +145,7 @@ class Tower {
     constructor(location: Coordinate) {
         this.range = 100;
         this.location = location;
-        this.maxTickCoolDown = 10;
+        this.maxTickCoolDown = 1;
         this.tickCoolDown = 0;
     }
 
@@ -272,7 +272,56 @@ const path: Path = [
     ],
 ];
 const GAME = new Game(path);
+
+const START_TIME = Date.now();
 //! RENDERING
+
+const physics = async () => {
+    const time = (Date.now() - START_TIME) / 1000;
+    console.log(time);
+
+    GAME.tick(time);
+
+    // collision
+    for (const bullet of GAME.gameBullets) {
+        const bulletPosition = bullet.getPosition(time);
+
+        for (const enemy of GameEnemies) {
+            if (bullet.touchedIds.includes(enemy.id)) {
+                continue;
+            }
+
+            const enemyPosition = enemy.getPositionInformation(
+                time,
+                GAME.gamePath,
+                GAME.totalGamePathLength
+            );
+            if (enemyPosition === undefined) continue;
+
+            const dist = distance(bulletPosition, enemyPosition.location);
+
+            if (dist <= enemy.gameRadius) {
+                enemy.health -= 1;
+                bullet.touchedIds.push(enemy.id);
+            }
+        }
+    }
+
+    // targeting
+
+    for (const tower of GameTowers) {
+        const bullets = tower.targetEnemies(
+            time,
+            GameEnemies,
+            GAME.gamePath,
+            GAME.totalGamePathLength
+        );
+
+        if (bullets) {
+            GAME.gameBullets.push(...bullets);
+        }
+    }
+};
 
 const render = async () => {
     const ctx = gameCanvas.getContext('2d');
@@ -280,8 +329,9 @@ const render = async () => {
         throw new Error('unable to get context');
     }
 
-    const frame = (DOMtime: DOMHighResTimeStamp) => {
-        const time = DOMtime / 1000;
+    const frame = () => {
+        const time = (Date.now() - START_TIME) / 1000;
+
         // clears the frame and reset to default
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
@@ -291,33 +341,6 @@ const render = async () => {
         ctx.rect(0, 0, gameCanvas.width, gameCanvas.height);
         ctx.fill();
         ctx.stroke();
-
-        GAME.tick(time);
-
-        // collision
-        for (const bullet of GAME.gameBullets) {
-            const bulletPosition = bullet.getPosition(time);
-
-            for (const enemy of GameEnemies) {
-                if (bullet.touchedIds.includes(enemy.id)) {
-                    continue;
-                }
-
-                const enemyPosition = enemy.getPositionInformation(
-                    time,
-                    GAME.gamePath,
-                    GAME.totalGamePathLength
-                );
-                if (enemyPosition === undefined) continue;
-
-                const dist = distance(bulletPosition, enemyPosition.location);
-
-                if (dist <= enemy.gameRadius) {
-                    enemy.health -= 1;
-                    bullet.touchedIds.push(enemy.id);
-                }
-            }
-        }
 
         // path
 
@@ -371,17 +394,6 @@ const render = async () => {
         // towers
 
         for (const tower of GameTowers) {
-            const bullets = tower.targetEnemies(
-                time,
-                GameEnemies,
-                GAME.gamePath,
-                GAME.totalGamePathLength
-            );
-
-            if (bullets) {
-                GAME.gameBullets.push(...bullets);
-            }
-
             ctx.beginPath();
             ctx.arc(tower.location.x, tower.location.y, 15, 0, Math.PI * 2);
             ctx.fillStyle = 'brown';
@@ -406,5 +418,7 @@ const render = async () => {
 };
 
 render();
+
+setInterval(physics, 100);
 
 export {};

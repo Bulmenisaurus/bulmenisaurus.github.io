@@ -64,7 +64,7 @@ class Enemy {
         this.speed = 100;
         this.tickOffset = tickOffset;
         this.gameRadius = 20;
-        this.health = 6;
+        this.health = 3;
         this.id = id;
     }
     getPositionInformation(time, path, totalPathLength) {
@@ -105,7 +105,7 @@ class Tower {
     constructor(location) {
         this.range = 100;
         this.location = location;
-        this.maxTickCoolDown = 10;
+        this.maxTickCoolDown = 1;
         this.tickCoolDown = 0;
     }
     getEnemiesInRange(time, enemies, path, totalPathLength) {
@@ -191,15 +191,45 @@ const path = [
     ],
 ];
 const GAME = new Game(path);
+const START_TIME = Date.now();
 //! RENDERING
+const physics = () => __awaiter(void 0, void 0, void 0, function* () {
+    const time = (Date.now() - START_TIME) / 1000;
+    console.log(time);
+    GAME.tick(time);
+    // collision
+    for (const bullet of GAME.gameBullets) {
+        const bulletPosition = bullet.getPosition(time);
+        for (const enemy of GameEnemies) {
+            if (bullet.touchedIds.includes(enemy.id)) {
+                continue;
+            }
+            const enemyPosition = enemy.getPositionInformation(time, GAME.gamePath, GAME.totalGamePathLength);
+            if (enemyPosition === undefined)
+                continue;
+            const dist = distance(bulletPosition, enemyPosition.location);
+            if (dist <= enemy.gameRadius) {
+                enemy.health -= 1;
+                bullet.touchedIds.push(enemy.id);
+            }
+        }
+    }
+    // targeting
+    for (const tower of GameTowers) {
+        const bullets = tower.targetEnemies(time, GameEnemies, GAME.gamePath, GAME.totalGamePathLength);
+        if (bullets) {
+            GAME.gameBullets.push(...bullets);
+        }
+    }
+});
 const render = () => __awaiter(void 0, void 0, void 0, function* () {
     const ctx = gameCanvas.getContext('2d');
     if (ctx === null) {
         throw new Error('unable to get context');
     }
-    const frame = (DOMtime) => {
+    const frame = () => {
         var _a;
-        const time = DOMtime / 1000;
+        const time = (Date.now() - START_TIME) / 1000;
         // clears the frame and reset to default
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
         // game field
@@ -208,24 +238,6 @@ const render = () => __awaiter(void 0, void 0, void 0, function* () {
         ctx.rect(0, 0, gameCanvas.width, gameCanvas.height);
         ctx.fill();
         ctx.stroke();
-        GAME.tick(time);
-        // collision
-        for (const bullet of GAME.gameBullets) {
-            const bulletPosition = bullet.getPosition(time);
-            for (const enemy of GameEnemies) {
-                if (bullet.touchedIds.includes(enemy.id)) {
-                    continue;
-                }
-                const enemyPosition = enemy.getPositionInformation(time, GAME.gamePath, GAME.totalGamePathLength);
-                if (enemyPosition === undefined)
-                    continue;
-                const dist = distance(bulletPosition, enemyPosition.location);
-                if (dist <= enemy.gameRadius) {
-                    enemy.health -= 1;
-                    bullet.touchedIds.push(enemy.id);
-                }
-            }
-        }
         // path
         for (const lineSegment of GAME.gamePath) {
             ctx.lineWidth = 10;
@@ -264,10 +276,6 @@ const render = () => __awaiter(void 0, void 0, void 0, function* () {
         }
         // towers
         for (const tower of GameTowers) {
-            const bullets = tower.targetEnemies(time, GameEnemies, GAME.gamePath, GAME.totalGamePathLength);
-            if (bullets) {
-                GAME.gameBullets.push(...bullets);
-            }
             ctx.beginPath();
             ctx.arc(tower.location.x, tower.location.y, 15, 0, Math.PI * 2);
             ctx.fillStyle = 'brown';
@@ -287,5 +295,6 @@ const render = () => __awaiter(void 0, void 0, void 0, function* () {
     window.requestAnimationFrame(frame);
 });
 render();
+setInterval(physics, 100);
 export {};
 //# sourceMappingURL=tower-defense.js.map
