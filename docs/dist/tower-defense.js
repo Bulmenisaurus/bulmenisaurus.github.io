@@ -1,3 +1,4 @@
+//TODO: something like preact for dynamically re-rendering ui components
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -19,6 +20,11 @@ const isPointInRectangle = (point, topLeft, bottomRight) => {
     const { x, y } = point;
     return x1 <= x && x2 >= x && y1 <= y && y2 >= y;
 };
+const removeAllChildNodes = (parent) => {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+};
 /**
  * computes the angle needed to point at a coordinate
  * https://stackoverflow.com/a/27481611/13996389
@@ -33,12 +39,14 @@ const angleOf = (a, b) => {
 };
 //! Bullet
 class Bullet {
-    constructor(coordinate, angle, speed, startTime) {
+    constructor(coordinate, angle, speed, startTime, parent) {
         this.initialPosition = coordinate;
         this.angle = angle;
         this.speed = speed;
         this.startTime = startTime;
         this.touchedIds = [];
+        this.parent = parent;
+        this.damage = 1;
     }
     getPosition(time) {
         const elapsedTime = time - this.startTime;
@@ -98,6 +106,7 @@ class Tower {
         this.location = location;
         this.maxTickCoolDown = 1;
         this.tickCoolDown = 0;
+        this.pops = 0;
         this.id = id;
     }
     getEnemiesInRange(time, enemies, path, totalPathLength) {
@@ -128,7 +137,7 @@ class Tower {
         if (enemyPosition === undefined)
             return;
         const enemyAngle = angleOf(this.location, enemyPosition);
-        return [new Bullet(this.location, enemyAngle, 400, time)];
+        return [new Bullet(this.location, enemyAngle, 400, time, this)];
     }
 }
 class SimpleTower extends Tower {
@@ -151,7 +160,7 @@ class MultiHitTower extends Tower {
         let bullets = [];
         for (let i = 0; i < amountOfBullets; i++) {
             let bulletAngle = (fullCircle / amountOfBullets) * i;
-            bullets.push(new Bullet(this.location, bulletAngle, 400, time));
+            bullets.push(new Bullet(this.location, bulletAngle, 400, time, this));
         }
         return bullets;
     }
@@ -198,8 +207,10 @@ class Game {
                     if (enemyPosition === undefined)
                         continue;
                     const dist = distance(bulletPosition, enemyPosition.location);
-                    if (dist <= enemy.gameRadius) {
-                        enemy.health -= 1;
+                    if (dist <= enemy.gameRadius && !enemy.dead) {
+                        // Only counts the pops that made the enemies health go to 0
+                        bullet.parent.pops += Math.min(enemy.health, bullet.damage);
+                        enemy.health -= bullet.damage;
                         bullet.touchedIds.push(enemy.id);
                     }
                 }
@@ -288,7 +299,12 @@ class Game {
         });
     }
     renderTowerUI(tower) {
-        this.uiContainer.innerText = `Current selected tower: ${tower === null || tower === void 0 ? void 0 : tower.id}`;
+        removeAllChildNodes(this.uiContainer);
+        if (tower === undefined) {
+            this.uiContainer.innerText = 'No tower currently selected';
+            return;
+        }
+        this.uiContainer.innerText = `Current selected tower: ${tower.pops}`;
     }
     onClick() {
         var _a;
