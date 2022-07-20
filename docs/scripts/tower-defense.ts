@@ -142,11 +142,13 @@ class Tower {
     location: Coordinate;
     maxTickCoolDown: number;
     tickCoolDown: number;
-    constructor(location: Coordinate) {
+    id: number;
+    constructor(location: Coordinate, id: number) {
         this.range = 100;
         this.location = location;
         this.maxTickCoolDown = 1;
         this.tickCoolDown = 0;
+        this.id = id;
     }
 
     getEnemiesInRange(time: number, enemies: Enemy[], path: Path, totalPathLength: number) {
@@ -232,19 +234,19 @@ class MultiHitTower extends Tower {
     }
 }
 
-const GameTowers: Tower[] = [
-    new MultiHitTower({ x: 450, y: 200 }),
-    new SimpleTower({ x: 400, y: 250 }),
-];
-
 //! Game Manager
 
 class Game {
     gameBullets: Bullet[];
+    gameTowers: Tower[];
     totalGamePathLength: number;
     gamePath: Path;
     constructor(gamePath: Path) {
         this.gameBullets = [];
+        this.gameTowers = [
+            new MultiHitTower({ x: 450, y: 200 }, 0),
+            new SimpleTower({ x: 400, y: 250 }, 1),
+        ];
         this.gamePath = gamePath;
         this.totalGamePathLength = this.gamePath.reduce((a, b) => a + distance(...b), 0);
     }
@@ -274,11 +276,37 @@ const path: Path = [
 const GAME = new Game(path);
 
 const START_TIME = Date.now();
+
+//! UI
+
+const uiContainer = document.getElementById('ui')!;
+
+let selectedTower: Tower | undefined;
+
+const renderTowerUI = (tower: Tower | undefined) => {
+    uiContainer.innerText = `Current selected tower: ${tower?.id}`;
+};
+
+gameCanvas.addEventListener('mousedown', () => {
+    const closestTowers = GAME.gameTowers.sort(
+        (a, b) => distance(mouseCoords, a.location) - distance(mouseCoords, b.location)
+    );
+
+    let currentSelectedTower: Tower | undefined;
+    if (closestTowers.length >= 1 && distance(closestTowers[0].location, mouseCoords) <= 20) {
+        currentSelectedTower = closestTowers[0];
+    }
+
+    if (selectedTower?.id !== currentSelectedTower?.id) {
+        selectedTower = currentSelectedTower;
+        renderTowerUI(currentSelectedTower);
+    }
+});
+
 //! RENDERING
 
 const physics = async () => {
     const time = (Date.now() - START_TIME) / 1000;
-    console.log(time);
 
     GAME.tick(time);
 
@@ -309,7 +337,7 @@ const physics = async () => {
 
     // targeting
 
-    for (const tower of GameTowers) {
+    for (const tower of GAME.gameTowers) {
         const bullets = tower.targetEnemies(
             time,
             GameEnemies,
@@ -393,7 +421,7 @@ const render = async () => {
 
         // towers
 
-        for (const tower of GameTowers) {
+        for (const tower of GAME.gameTowers) {
             ctx.beginPath();
             ctx.arc(tower.location.x, tower.location.y, 15, 0, Math.PI * 2);
             ctx.fillStyle = 'brown';

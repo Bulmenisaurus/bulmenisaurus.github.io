@@ -102,11 +102,12 @@ for (let i = 0; i < 10; i++) {
 }
 //! Towers
 class Tower {
-    constructor(location) {
+    constructor(location, id) {
         this.range = 100;
         this.location = location;
         this.maxTickCoolDown = 1;
         this.tickCoolDown = 0;
+        this.id = id;
     }
     getEnemiesInRange(time, enemies, path, totalPathLength) {
         return enemies.filter((enemy) => {
@@ -164,14 +165,14 @@ class MultiHitTower extends Tower {
         return bullets;
     }
 }
-const GameTowers = [
-    new MultiHitTower({ x: 450, y: 200 }),
-    new SimpleTower({ x: 400, y: 250 }),
-];
 //! Game Manager
 class Game {
     constructor(gamePath) {
         this.gameBullets = [];
+        this.gameTowers = [
+            new MultiHitTower({ x: 450, y: 200 }, 0),
+            new SimpleTower({ x: 400, y: 250 }, 1),
+        ];
         this.gamePath = gamePath;
         this.totalGamePathLength = this.gamePath.reduce((a, b) => a + distance(...b), 0);
     }
@@ -192,10 +193,26 @@ const path = [
 ];
 const GAME = new Game(path);
 const START_TIME = Date.now();
+//! UI
+const uiContainer = document.getElementById('ui');
+let selectedTower;
+const renderTowerUI = (tower) => {
+    uiContainer.innerText = `Current selected tower: ${tower === null || tower === void 0 ? void 0 : tower.id}`;
+};
+gameCanvas.addEventListener('mousedown', () => {
+    const closestTowers = GAME.gameTowers.sort((a, b) => distance(mouseCoords, a.location) - distance(mouseCoords, b.location));
+    let currentSelectedTower;
+    if (closestTowers.length >= 1 && distance(closestTowers[0].location, mouseCoords) <= 20) {
+        currentSelectedTower = closestTowers[0];
+    }
+    if ((selectedTower === null || selectedTower === void 0 ? void 0 : selectedTower.id) !== (currentSelectedTower === null || currentSelectedTower === void 0 ? void 0 : currentSelectedTower.id)) {
+        selectedTower = currentSelectedTower;
+        renderTowerUI(currentSelectedTower);
+    }
+});
 //! RENDERING
 const physics = () => __awaiter(void 0, void 0, void 0, function* () {
     const time = (Date.now() - START_TIME) / 1000;
-    console.log(time);
     GAME.tick(time);
     // collision
     for (const bullet of GAME.gameBullets) {
@@ -215,7 +232,7 @@ const physics = () => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     // targeting
-    for (const tower of GameTowers) {
+    for (const tower of GAME.gameTowers) {
         const bullets = tower.targetEnemies(time, GameEnemies, GAME.gamePath, GAME.totalGamePathLength);
         if (bullets) {
             GAME.gameBullets.push(...bullets);
@@ -275,7 +292,7 @@ const render = () => __awaiter(void 0, void 0, void 0, function* () {
             ctx.fillStyle = 'black';
         }
         // towers
-        for (const tower of GameTowers) {
+        for (const tower of GAME.gameTowers) {
             ctx.beginPath();
             ctx.arc(tower.location.x, tower.location.y, 15, 0, Math.PI * 2);
             ctx.fillStyle = 'brown';
