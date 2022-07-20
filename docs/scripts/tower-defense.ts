@@ -33,18 +33,6 @@ const angleOf = (a: Coordinate, b: Coordinate) => {
     return angle;
 };
 
-const gameCanvas = document.querySelector('canvas')!;
-const GAME_WIDTH = gameCanvas.width;
-const GAME_HEIGHT = gameCanvas.height;
-
-//! mouse handling
-
-const mouseCoords: Coordinate = { x: 0, y: 0 };
-gameCanvas.addEventListener('mousemove', (e) => {
-    mouseCoords.x = e.offsetX;
-    mouseCoords.y = e.offsetY;
-});
-
 //! Bullet
 
 class Bullet {
@@ -237,216 +225,263 @@ class MultiHitTower extends Tower {
 //! Game Manager
 
 class Game {
-    gameBullets: Bullet[];
-    gameTowers: Tower[];
-    totalGamePathLength: number;
-    gamePath: Path;
-    constructor(gamePath: Path) {
-        this.gameBullets = [];
-        this.gameTowers = [
+    startTime: number;
+    mouseCoords: Coordinate;
+
+    uiContainer: HTMLDivElement;
+
+    gameCanvas: HTMLCanvasElement;
+    gameWidth: number;
+    gameHeight: number;
+
+    path: Path;
+    totalPathLength: number;
+
+    projectiles: Bullet[];
+    towers: Tower[];
+    selectedTower: Tower | undefined;
+
+    constructor(
+        gameCanvas: HTMLCanvasElement,
+        uiContainer: HTMLDivElement,
+        path: Path,
+        startTime: number
+    ) {
+        this.startTime = startTime;
+
+        this.mouseCoords = { x: 0, y: 0 };
+        gameCanvas.addEventListener('mousemove', (e) => {
+            this.onMouseMove(e);
+        });
+
+        this.uiContainer = uiContainer;
+
+        this.gameCanvas = gameCanvas;
+        this.gameWidth = gameCanvas.width;
+        this.gameHeight = gameCanvas.height;
+
+        this.path = path;
+        this.totalPathLength = this.path.reduce((a, b) => a + distance(...b), 0);
+
+        this.projectiles = [];
+        this.towers = [
             new MultiHitTower({ x: 450, y: 200 }, 0),
             new SimpleTower({ x: 400, y: 250 }, 1),
         ];
-        this.gamePath = gamePath;
-        this.totalGamePathLength = this.gamePath.reduce((a, b) => a + distance(...b), 0);
+
+        gameCanvas.addEventListener('click', () => {
+            this.onClick();
+        });
     }
 
-    // runs every tick (frame) for cleanup and stuff
+    // runs every tick  for cleanup and stuff
     tick(time: number) {
-        this.gameBullets = this.gameBullets.filter((bullet) =>
+        this.projectiles = this.projectiles.filter((bullet) =>
             isPointInRectangle(
                 bullet.getPosition(time),
                 { x: 0, y: 0 },
-                { x: GAME_WIDTH, y: GAME_HEIGHT }
+                { x: this.gameWidth, y: this.gameHeight }
             )
         );
     }
-}
 
-const path: Path = [
-    [
-        { x: 0, y: GAME_HEIGHT / 2 },
-        { x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2 },
-    ],
-    [
-        { x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2 },
-        { x: GAME_WIDTH, y: 0 },
-    ],
-];
-const GAME = new Game(path);
+    async physics() {
+        const time = (Date.now() - this.startTime) / 1000;
 
-const START_TIME = Date.now();
+        this.tick(time);
 
-//! UI
+        // collision
+        for (const bullet of this.projectiles) {
+            const bulletPosition = bullet.getPosition(time);
 
-const uiContainer = document.getElementById('ui')!;
+            for (const enemy of GameEnemies) {
+                if (bullet.touchedIds.includes(enemy.id)) {
+                    continue;
+                }
 
-let selectedTower: Tower | undefined;
+                const enemyPosition = enemy.getPositionInformation(
+                    time,
+                    this.path,
+                    this.totalPathLength
+                );
+                if (enemyPosition === undefined) continue;
 
-const renderTowerUI = (tower: Tower | undefined) => {
-    uiContainer.innerText = `Current selected tower: ${tower?.id}`;
-};
+                const dist = distance(bulletPosition, enemyPosition.location);
 
-gameCanvas.addEventListener('mousedown', () => {
-    const closestTowers = GAME.gameTowers.sort(
-        (a, b) => distance(mouseCoords, a.location) - distance(mouseCoords, b.location)
-    );
-
-    let currentSelectedTower: Tower | undefined;
-    if (closestTowers.length >= 1 && distance(closestTowers[0].location, mouseCoords) <= 20) {
-        currentSelectedTower = closestTowers[0];
-    }
-
-    if (selectedTower?.id !== currentSelectedTower?.id) {
-        selectedTower = currentSelectedTower;
-        renderTowerUI(currentSelectedTower);
-    }
-});
-
-//! RENDERING
-
-const physics = async () => {
-    const time = (Date.now() - START_TIME) / 1000;
-
-    GAME.tick(time);
-
-    // collision
-    for (const bullet of GAME.gameBullets) {
-        const bulletPosition = bullet.getPosition(time);
-
-        for (const enemy of GameEnemies) {
-            if (bullet.touchedIds.includes(enemy.id)) {
-                continue;
+                if (dist <= enemy.gameRadius) {
+                    enemy.health -= 1;
+                    bullet.touchedIds.push(enemy.id);
+                }
             }
+        }
 
-            const enemyPosition = enemy.getPositionInformation(
-                time,
-                GAME.gamePath,
-                GAME.totalGamePathLength
-            );
-            if (enemyPosition === undefined) continue;
+        // targeting
 
-            const dist = distance(bulletPosition, enemyPosition.location);
+        for (const tower of this.towers) {
+            const bullets = tower.targetEnemies(time, GameEnemies, this.path, this.totalPathLength);
 
-            if (dist <= enemy.gameRadius) {
-                enemy.health -= 1;
-                bullet.touchedIds.push(enemy.id);
+            if (bullets) {
+                this.projectiles.push(...bullets);
             }
         }
     }
 
-    // targeting
-
-    for (const tower of GAME.gameTowers) {
-        const bullets = tower.targetEnemies(
-            time,
-            GameEnemies,
-            GAME.gamePath,
-            GAME.totalGamePathLength
-        );
-
-        if (bullets) {
-            GAME.gameBullets.push(...bullets);
+    async render() {
+        const ctx = this.gameCanvas.getContext('2d');
+        if (ctx === null) {
+            throw new Error('unable to get context');
         }
-    }
-};
 
-const render = async () => {
-    const ctx = gameCanvas.getContext('2d');
-    if (ctx === null) {
-        throw new Error('unable to get context');
-    }
+        const frame = () => {
+            const time = (Date.now() - this.startTime) / 1000;
 
-    const frame = () => {
-        const time = (Date.now() - START_TIME) / 1000;
+            // clears the frame and reset to default
+            ctx.clearRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
 
-        // clears the frame and reset to default
-        ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-
-        // game field
-        ctx.beginPath();
-        ctx.fillStyle = '#bbb';
-        ctx.rect(0, 0, gameCanvas.width, gameCanvas.height);
-        ctx.fill();
-        ctx.stroke();
-
-        // path
-
-        for (const lineSegment of GAME.gamePath) {
-            ctx.lineWidth = 10;
+            // game field
             ctx.beginPath();
-            ctx.moveTo(lineSegment[0].x, lineSegment[0].y);
-            ctx.lineTo(lineSegment[1].x, lineSegment[1].y);
+            ctx.fillStyle = '#bbb';
+            ctx.rect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
+            ctx.fill();
             ctx.stroke();
 
-            // join lines at the end prettily
-            ctx.lineWidth /= 2;
-            ctx.beginPath();
-            ctx.arc(lineSegment[1].x, lineSegment[1].y, ctx.lineWidth / 2, 0, Math.PI * 2);
-            ctx.stroke();
-        }
-        ctx.lineWidth = 1;
+            // path
 
-        // bullets
-        for (const bullet of GAME.gameBullets) {
-            const position = bullet.getPosition(time);
-
-            ctx.beginPath();
-            ctx.arc(position.x, position.y, 5, 0, Math.PI * 2);
-            ctx.fillStyle = 'red';
-            ctx.fill();
-            ctx.fillStyle = 'black';
-        }
-
-        // enemies
-
-        for (const enemy of GameEnemies) {
-            if (enemy.dead) continue;
-
-            const enemyPosition = enemy.getPositionInformation(
-                time,
-                GAME.gamePath,
-                GAME.totalGamePathLength
-            )?.location;
-
-            if (enemyPosition === undefined) continue;
-
-            ctx.beginPath();
-            ctx.arc(enemyPosition.x, enemyPosition.y, enemy.gameRadius, 0, Math.PI * 2);
-            ctx.fillStyle = 'red';
-            ctx.fill();
-
-            ctx.fillStyle = 'black';
-        }
-
-        // towers
-
-        for (const tower of GAME.gameTowers) {
-            ctx.beginPath();
-            ctx.arc(tower.location.x, tower.location.y, 15, 0, Math.PI * 2);
-            ctx.fillStyle = 'brown';
-            ctx.fill();
-
-            ctx.fillStyle = 'black';
-
-            // 20 is the tower "hitbox"
-            if (distance(mouseCoords, tower.location) <= 20) {
+            for (const lineSegment of this.path) {
+                ctx.lineWidth = 10;
                 ctx.beginPath();
-                ctx.arc(tower.location.x, tower.location.y, tower.range, 0, Math.PI * 2);
-                ctx.setLineDash([10, 10]);
+                ctx.moveTo(lineSegment[0].x, lineSegment[0].y);
+                ctx.lineTo(lineSegment[1].x, lineSegment[1].y);
                 ctx.stroke();
-                ctx.setLineDash([0]);
+
+                // join lines at the end prettily
+                ctx.lineWidth /= 2;
+                ctx.beginPath();
+                ctx.arc(lineSegment[1].x, lineSegment[1].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+                ctx.stroke();
             }
-        }
+            ctx.lineWidth = 1;
+
+            // bullets
+            for (const bullet of this.projectiles) {
+                const position = bullet.getPosition(time);
+
+                ctx.beginPath();
+                ctx.arc(position.x, position.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+                ctx.fillStyle = 'black';
+            }
+
+            // enemies
+
+            for (const enemy of GameEnemies) {
+                if (enemy.dead) continue;
+
+                const enemyPosition = enemy.getPositionInformation(
+                    time,
+                    this.path,
+                    this.totalPathLength
+                )?.location;
+
+                if (enemyPosition === undefined) continue;
+
+                ctx.beginPath();
+                ctx.arc(enemyPosition.x, enemyPosition.y, enemy.gameRadius, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+
+                ctx.fillStyle = 'black';
+            }
+
+            // towers
+
+            for (const tower of this.towers) {
+                ctx.beginPath();
+                ctx.arc(tower.location.x, tower.location.y, 15, 0, Math.PI * 2);
+                ctx.fillStyle = 'brown';
+                ctx.fill();
+
+                ctx.fillStyle = 'black';
+
+                // 20 is the tower "hitbox"
+                if (distance(this.mouseCoords, tower.location) <= 20) {
+                    ctx.beginPath();
+                    ctx.arc(tower.location.x, tower.location.y, tower.range, 0, Math.PI * 2);
+                    ctx.setLineDash([10, 10]);
+                    ctx.stroke();
+                    ctx.setLineDash([0]);
+                }
+            }
+
+            window.requestAnimationFrame(frame);
+        };
 
         window.requestAnimationFrame(frame);
-    };
+    }
 
-    window.requestAnimationFrame(frame);
+    renderTowerUI(tower: Tower | undefined) {
+        this.uiContainer.innerText = `Current selected tower: ${tower?.id}`;
+    }
+
+    onClick() {
+        const closestTowers = this.towers.sort(
+            (a, b) =>
+                distance(this.mouseCoords, a.location) - distance(this.mouseCoords, b.location)
+        );
+
+        let currentSelectedTower: Tower | undefined;
+        if (
+            closestTowers.length >= 1 &&
+            distance(closestTowers[0].location, this.mouseCoords) <= 20
+        ) {
+            currentSelectedTower = closestTowers[0];
+        }
+
+        if (this.selectedTower?.id !== currentSelectedTower?.id) {
+            this.selectedTower = currentSelectedTower;
+            this.renderTowerUI(currentSelectedTower);
+        }
+    }
+
+    onMouseMove(e: MouseEvent) {
+        this.mouseCoords.x = e.offsetX;
+        this.mouseCoords.y = e.offsetY;
+    }
+}
+
+const init = () => {
+    const gameCanvas = document.querySelector('canvas');
+
+    const uiContainer = <HTMLDivElement | null>document.getElementById('ui');
+
+    if (gameCanvas === null || uiContainer === null) {
+        console.error(`Error locating necessary html elements`, { gameCanvas, uiContainer });
+        throw new Error();
+    }
+
+    const GAME_WIDTH = gameCanvas.width;
+    const GAME_HEIGHT = gameCanvas.height;
+
+    const path: Path = [
+        [
+            { x: 0, y: GAME_HEIGHT / 2 },
+            { x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2 },
+        ],
+        [
+            { x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2 },
+            { x: GAME_WIDTH, y: 0 },
+        ],
+    ];
+    const START_TIME = Date.now();
+    const GAME = new Game(gameCanvas, uiContainer, path, START_TIME);
+
+    setInterval(() => {
+        GAME.physics();
+    }, 100);
+    GAME.render();
 };
 
-render();
-
-setInterval(physics, 100);
+init();
 
 export {};
