@@ -289,6 +289,7 @@ class Game {
             new SimpleTower({ x: 400, y: 250 }, 1),
         ];
 
+        this.renderTowerUI(undefined);
         gameCanvas.addEventListener('click', () => {
             this.onClick();
         });

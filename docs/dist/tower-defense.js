@@ -184,6 +184,7 @@ class Game {
             new MultiHitTower({ x: 450, y: 200 }, 0),
             new SimpleTower({ x: 400, y: 250 }, 1),
         ];
+        this.renderTowerUI(undefined);
         gameCanvas.addEventListener('click', () => {
             this.onClick();
         });
