@@ -241,9 +241,17 @@ const loadingBars = [
     //     document.body.appendChild(canvas);
     // },
 ];
+const LSLastLoadingBar = localStorage.getItem('last-loading-bar');
+let lastLoadingBar;
+if (LSLastLoadingBar !== null && !isNaN(parseInt(LSLastLoadingBar))) {
+    lastLoadingBar = parseInt(LSLastLoadingBar);
+}
 const urlParams = new URLSearchParams(window.location.search);
 const loadingBar = urlParams.get('l');
-let theme = Math.floor(Math.random() * loadingBars.length);
+let theme = -1;
+while (theme === lastLoadingBar || theme === -1) {
+    theme = Math.floor(Math.random() * loadingBars.length);
+}
 if (loadingBar !== null) {
     const parsed = parseInt(loadingBar);
     if (!isNaN(parsed)) {
@@ -251,5 +259,6 @@ if (loadingBar !== null) {
     }
 }
 loadingBars[theme]();
+localStorage.setItem('last-loading-bar', theme.toString());
 export {};
 //# sourceMappingURL=script.js.map
