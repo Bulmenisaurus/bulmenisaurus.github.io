@@ -418,23 +418,37 @@ class Game {
             }
 
             // towers
-
+            let towerToDrawHighlight: Tower | undefined = this.selectedTower;
             for (const tower of this.towers) {
                 ctx.beginPath();
                 ctx.arc(tower.location.x, tower.location.y, 15, 0, Math.PI * 2);
                 ctx.fillStyle = 'brown';
                 ctx.fill();
+                ctx.stroke();
 
                 ctx.fillStyle = 'black';
 
                 // 20 is the tower "hitbox"
-                if (distance(this.mouseCoords, tower.location) <= 20) {
-                    ctx.beginPath();
-                    ctx.arc(tower.location.x, tower.location.y, tower.range, 0, Math.PI * 2);
-                    ctx.setLineDash([10, 10]);
-                    ctx.stroke();
-                    ctx.setLineDash([0]);
+                if (
+                    distance(this.mouseCoords, tower.location) <= 20 &&
+                    towerToDrawHighlight === undefined
+                ) {
+                    towerToDrawHighlight = tower;
                 }
+            }
+
+            if (towerToDrawHighlight !== undefined) {
+                ctx.beginPath();
+                ctx.arc(
+                    towerToDrawHighlight.location.x,
+                    towerToDrawHighlight.location.y,
+                    towerToDrawHighlight.range,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.setLineDash([10, 10]);
+                ctx.stroke();
+                ctx.setLineDash([0]);
             }
 
             window.requestAnimationFrame(frame);
