@@ -150,7 +150,7 @@ const loadingBars = [
 
         const textLoadingBar = (element: HTMLElement) => {
             const drawPercent = (percentFull: number = 100) => {
-                const content = '='.repeat(Math.floor(percentFull / 5));
+                const content = '='.repeat(Math.round(percentFull / 5));
                 const percentText = Math.round(percentFull).toString().padStart(3, ' ');
                 element.innerText = `[${content.padEnd(20, ' ')}] ${percentText}%`;
             };
