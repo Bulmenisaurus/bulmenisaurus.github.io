@@ -10,6 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 const sleep = (ms) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
+const coordinateDistance = (a, b) => Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
+const remove = (item, arr) => {
+    const itemIdx = arr.indexOf(item);
+    if (itemIdx === -1) {
+        return;
+    }
+    arr.splice(itemIdx, 1);
+};
 const loadingBars = [
     () => {
         const loadingContainer = document.createElement('div');
@@ -240,6 +248,154 @@ const loadingBars = [
     //     draw();
     //     document.body.appendChild(canvas);
     // },
+    () => __awaiter(void 0, void 0, void 0, function* () {
+        const VERTICES_AMOUNT = 100;
+        document.body.classList.add('dark');
+        const canvas = document.createElement('canvas');
+        canvas.classList.add('graph');
+        canvas.width = 2000;
+        canvas.height = 1000;
+        const ctx = canvas.getContext('2d');
+        if (ctx === null) {
+            throw new Error('ctx is null');
+        }
+        document.body.appendChild(canvas);
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const vertices = [];
+        const pad = Math.min(canvas.width, canvas.height) * (1 / 100);
+        for (let i = 0; i < VERTICES_AMOUNT; i++) {
+            const x = Math.floor(Math.random() * (canvas.width - pad)) + pad / 2;
+            const y = Math.floor(Math.random() * (canvas.height - pad)) + pad / 2;
+            vertices.push({ x, y });
+        }
+        // TSP algorithms
+        const closestVertexAlgorithm = (v, draw) => __awaiter(void 0, void 0, void 0, function* () {
+            const edges = [];
+            const visitedVertices = [];
+            let previousVertexIdx = 0;
+            for (let i = 0; i < v.length - 1; i++) {
+                visitedVertices.push(previousVertexIdx);
+                const currentVertex = v[previousVertexIdx];
+                const unvisitedVertices = v
+                    .map((_, idx) => idx)
+                    .filter((idx) => !visitedVertices.includes(idx));
+                const closestVertex = unvisitedVertices.sort((a, b) => coordinateDistance(currentVertex, v[a]) -
+                    coordinateDistance(currentVertex, v[b]))[0];
+                edges.push([currentVertex, v[closestVertex]]);
+                yield draw(edges);
+                visitedVertices.push(closestVertex);
+                previousVertexIdx = closestVertex;
+            }
+            edges.push([v[0], v[previousVertexIdx]]);
+            yield draw(edges);
+            return edges;
+        });
+        const rotateAlgorithm = (v, draw) => __awaiter(void 0, void 0, void 0, function* () {
+            const edges = [];
+            // average x and y coordinate
+            const referencePointX = v.reduce((a, b) => a + b.x, 0) / v.length;
+            const referencePointY = v.reduce((a, b) => a + b.y, 0) / v.length;
+            const angleAround = (point) => {
+                const normX = point.x - referencePointX;
+                const normY = point.y - referencePointY;
+                return Math.atan2(normY, normX);
+            };
+            const orderedPoints = v.sort((a, b) => angleAround(a) - angleAround(b));
+            for (let i = 0; i < orderedPoints.length - 1; i++) {
+                edges.push([orderedPoints[i], orderedPoints[i + 1]]);
+                yield draw(edges);
+            }
+            edges.push([orderedPoints[0], orderedPoints[orderedPoints.length - 1]]);
+            yield draw(edges);
+            return edges;
+        });
+        //TODO: finish
+        const christofidesAlgorithm = (v, draw) => __awaiter(void 0, void 0, void 0, function* () {
+            // Minimum spanning tree
+            const generateMST = (vertices) => __awaiter(void 0, void 0, void 0, function* () {
+                let edges = [];
+                let edgeIndices = [];
+                let visitedVertices = [0];
+                let unvisitedVertices = vertices.map((_, idx) => idx);
+                remove(0, unvisitedVertices);
+                for (let i = 0; i < vertices.length - 1; i++) {
+                    let minCost;
+                    let minCostVertices;
+                    visitedVertices.forEach((v) => {
+                        unvisitedVertices.forEach((u) => {
+                            const cost = coordinateDistance(vertices[u], vertices[v]);
+                            if (minCost === undefined || cost < minCost) {
+                                minCost = cost;
+                                minCostVertices = [v, u];
+                            }
+                        });
+                    });
+                    if (minCost === undefined || minCostVertices === undefined) {
+                        console.error('Mincost is undefined');
+                        continue;
+                    }
+                    // second is unvisited
+                    const [a, b] = minCostVertices;
+                    remove(b, unvisitedVertices);
+                    visitedVertices.push(b);
+                    edges.push([vertices[a], vertices[b]]);
+                    edgeIndices.push([a, b]);
+                    yield draw(edges);
+                }
+                return edgeIndices;
+            });
+            const perfectMatching = (edges) => __awaiter(void 0, void 0, void 0, function* () {
+                const vertexCounts = new Map();
+                const oddDegreeVertices = [];
+                for (const edge of edges.flat()) {
+                    if (vertexCounts.has(edge)) {
+                        vertexCounts.set(edge, vertexCounts.get(edge) + 1);
+                    }
+                    else {
+                        vertexCounts.set(edge, 1);
+                    }
+                }
+                for (const [vertex, amount] of vertexCounts) {
+                    if (amount % 2 === 1) {
+                        oddDegreeVertices.push(vertex);
+                    }
+                }
+                yield draw(edges.map((e) => [v[e[0]], v[e[1]]]), oddDegreeVertices.map((m) => vertices[m]));
+                return [];
+            });
+            const mst = yield generateMST(v);
+            const match = yield perfectMatching(mst);
+        });
+        ctx.strokeStyle = 'rgb(0, 150, 200)';
+        ctx.lineWidth = 2;
+        const draw = (edges, v) => __awaiter(void 0, void 0, void 0, function* () {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            for (const edge of edges) {
+                ctx.moveTo(edge[0].x, edge[0].y);
+                ctx.lineTo(edge[1].x, edge[1].y);
+                ctx.stroke();
+            }
+            ctx.fillStyle = 'rgb(220, 220, 220)';
+            vertices.forEach((v) => {
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.fillStyle = 'rgb(150, 0, 200)';
+            (v || []).forEach((c) => {
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            yield sleep(3000 / VERTICES_AMOUNT);
+        });
+        const algorithms = [closestVertexAlgorithm, rotateAlgorithm];
+        const randomAlgorithm = algorithms[Math.floor(Math.random() * algorithms.length)];
+        const path = yield randomAlgorithm(vertices, draw);
+        ctx.fillStyle = 'rgb(200, 200, 200)';
+    }),
 ];
 const LSLastLoadingBar = localStorage.getItem('last-loading-bar');
 let lastLoadingBar;

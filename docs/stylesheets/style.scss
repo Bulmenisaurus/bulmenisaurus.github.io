@@ -57,9 +57,9 @@ canvas.sorting {
     height: calc(70vmin * 5 / 33);
 }
 
-canvas {
-    width: 50vmin;
-    height: 50vmin;
+canvas.graph {
+    width: 80vmin;
+    height: 40vmin;
 }
 
 .text-loading-bar,
