@@ -614,7 +614,7 @@ if (loadingBar !== null) {
     }
 }
 
-loadingBars[4]();
+loadingBars[theme]();
 localStorage.setItem('last-loading-bar', theme.toString());
 
 export {};
