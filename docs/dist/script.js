@@ -396,6 +396,53 @@ const loadingBars = [
         const path = yield randomAlgorithm(vertices, draw);
         ctx.fillStyle = 'rgb(200, 200, 200)';
     }),
+    () => __awaiter(void 0, void 0, void 0, function* () {
+        const canvas = document.createElement('canvas');
+        canvas.classList.add('voroni');
+        const ctx = canvas.getContext('2d');
+        if (ctx === null) {
+            throw new Error('CTX is null');
+        }
+        const size = 500;
+        canvas.width = canvas.height = size;
+        document.body.appendChild(canvas);
+        const points = [];
+        const POINTS_AMOUNT = 50;
+        // expressed as a percentage (50 is max)
+        let pad = 5 / 100;
+        for (let i = 0; i < POINTS_AMOUNT; i++) {
+            const x = (Math.random() * (1 - 2 * pad) + pad) * size;
+            const y = (Math.random() * (1 - 2 * pad) + pad) * size;
+            const hue = Math.floor(360 * (i / POINTS_AMOUNT));
+            points.push({ x, y, color: `hsl(${hue} 70% 74%)` });
+        }
+        const manhattanDistance = (a, b) => {
+            let p = 1;
+            return (Math.abs(a.x - b.x) ** p + Math.abs(a.y - b.y) ** p) ** (1 / p);
+        };
+        const euclideanDistance = coordinateDistance;
+        const startTime = Date.now();
+        for (let x = 0; x < size; x++) {
+            for (let y = 0; y < size; y++) {
+                const s = [manhattanDistance][(x + y) % 1];
+                let closestPoint = points[0];
+                let closestPointDistance = s({ x, y }, closestPoint);
+                // better than .sort()
+                for (const point of points) {
+                    let distance = s({ x, y }, point);
+                    if (distance < closestPointDistance) {
+                        closestPoint = point;
+                        closestPointDistance = distance;
+                    }
+                }
+                ctx.fillStyle = closestPoint.color;
+                ctx.beginPath();
+                ctx.rect(x, y, 1, 1);
+                ctx.fill();
+            }
+        }
+        console.log(`Took ${Date.now() - startTime}ms to compute voroni`);
+    }),
 ];
 const LSLastLoadingBar = localStorage.getItem('last-loading-bar');
 let lastLoadingBar;
@@ -414,7 +461,7 @@ if (loadingBar !== null) {
         theme = parsed;
     }
 }
-loadingBars[theme]();
+loadingBars[4]();
 localStorage.setItem('last-loading-bar', theme.toString());
 export {};
 //# sourceMappingURL=script.js.map
