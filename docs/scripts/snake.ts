@@ -39,6 +39,25 @@ const GameData: Level[] = [
     },
     {
         name: '1-3',
+        snake: [...line(0, 60, -10, 60)],
+        blocks: [
+            ...line(0, 0, 240, 0), // top row
+            ...line(0, 0, 240, 120), // bottom row
+            ...rectangle(40, 0, 60, 70), // column 1
+            ...rectangle(110, 50, 130, 120), // column 2
+            ...rectangle(180, 0, 200, 70), // column 3
+        ],
+        goal: line(0, 50, 0, 70),
+        food: [
+            [50, 90],
+            [120, 30],
+            [190, 90],
+            [230, 30],
+        ],
+        speed: 130,
+    },
+    {
+        name: '1-4',
         snake: [[0, 10]],
         blocks: [
             ...rectangle(0, 0, 80, 80, ...rectangle(10, 10, 70, 70)),
@@ -158,7 +177,6 @@ class Snake {
 
     moveSnake(direction: string) {
         const newHead = { x: this.tiles[0][0], y: this.tiles[0][1] };
-        console.log(direction);
         switch (direction) {
             case 'up':
                 newHead.y -= 10;
