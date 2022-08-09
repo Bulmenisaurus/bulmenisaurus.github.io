@@ -587,6 +587,267 @@ const loadingBars = [
 
         console.log(`Took ${Date.now() - startTime}ms to compute voroni`);
     },
+    async () => {
+        const canvas = document.createElement('canvas');
+        let size = 1000;
+        canvas.width = canvas.height = size;
+        canvas.classList.add('triangulation');
+        document.body.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        ``;
+        if (ctx === null) {
+            throw new Error('error getting context');
+        }
+
+        type Polygon = Coordinate[];
+
+        const shuffle = <ItemType>(array: ItemType[], seed?: number): ItemType[] => {
+            let currentIndex = array.length;
+            let randomIndex = -1;
+
+            const normalizedSin = (n: number) => (Math.sin(n) + 1) / 2;
+
+            // While there remain elements to shuffle.
+            while (currentIndex != 0) {
+                // Pick a remaining element.
+                if (seed === undefined) {
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                } else {
+                    randomIndex = Math.floor(
+                        normalizedSin(seed * (currentIndex + 7)) * currentIndex
+                    );
+                }
+                currentIndex--;
+
+                // And swap it with the current element.
+                [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex],
+                    array[currentIndex],
+                ];
+            }
+
+            return array;
+        };
+
+        const generateConvexPolygon = (nPoints: number): Polygon => {
+            // https://cglab.ca/~sander/misc/ConvexGeneration/convex.html
+            let xPool: number[] = [];
+            let yPool: number[] = [];
+
+            for (let i = 0; i < nPoints; i++) {
+                xPool.push(Math.random());
+                yPool.push(Math.random());
+            }
+
+            xPool = xPool.sort((a, b) => a - b);
+            yPool = yPool.sort((a, b) => a - b);
+
+            const minX = xPool[0];
+            const maxX = xPool[nPoints - 1];
+            const minY = yPool[0];
+            const maxY = yPool[nPoints - 1];
+
+            let xVectors: number[] = [];
+            let yVectors: number[] = [];
+
+            let lastTop = minX;
+            let lastBottom = minX;
+
+            for (let i = 1; i < nPoints - 1; i++) {
+                let x = xPool[i];
+
+                if (Math.random() > 0.5) {
+                    xVectors.push(x - lastTop);
+                    lastTop = x;
+                } else {
+                    xVectors.push(lastBottom - x);
+                    lastBottom = x;
+                }
+            }
+
+            xVectors.push(maxX - lastTop);
+            xVectors.push(lastBottom - maxX);
+
+            let lastLeft = minY;
+            let lastRight = minY;
+
+            for (let i = 1; i < nPoints - 1; i++) {
+                let y = yPool[i];
+
+                if (Math.random() > 0.5) {
+                    yVectors.push(y - lastLeft);
+                    lastLeft = y;
+                } else {
+                    yVectors.push(lastRight - y);
+                    lastRight = y;
+                }
+            }
+
+            yVectors.push(maxY - lastLeft);
+            yVectors.push(lastRight - maxY);
+
+            yVectors = shuffle(yVectors);
+
+            let vectors: [number, number][] = [];
+
+            for (let i = 0; i < nPoints; i++) {
+                vectors.push([xVectors[i], yVectors[i]]);
+            }
+
+            vectors = vectors.sort((a, b) => {
+                let angleA = Math.atan2(...a);
+                let angleB = Math.atan2(...b);
+
+                return angleA - angleB;
+            });
+
+            let x = 0;
+            let y = 0;
+            let minPolygonX = 0;
+            let minPolygonY = 0;
+            let points: Coordinate[] = [];
+
+            for (let i = 0; i < nPoints; i++) {
+                points.push({ x, y });
+
+                x += vectors[i][0];
+                y += vectors[i][1];
+
+                minPolygonX = Math.min(minPolygonX, x);
+                minPolygonY = Math.min(minPolygonY, y);
+            }
+
+            let xShift = minX - minPolygonX;
+            let yShift = minY - minPolygonY;
+
+            for (let i = 0; i < nPoints; i++) {
+                let p = points[i];
+
+                points[i] = { x: p.x + xShift, y: p.y + yShift };
+            }
+
+            return points;
+        };
+
+        const triangulateConvexPolygon = (polygon: Polygon): Polygon[] => {
+            if (polygon.length === 3) {
+                return triangulateTriangle(polygon);
+            }
+
+            let triangles: Polygon[] = [];
+            // connect everysingle vertex to the 0th vertex
+            for (let i = 1; i < polygon.length - 1; i++) {
+                let points = [polygon[0], polygon[i], polygon[i + 1]];
+                triangles.push(shuffle(points));
+            }
+
+            return shuffle(triangles);
+        };
+
+        const triangulateTriangle = (polygon: Polygon): Polygon[] => {
+            let polygons: Polygon[] = [];
+
+            let p0 = polygon[0];
+            let p1 = polygon[1];
+            let p2 = polygon[2];
+
+            let [minX, maxX] = [p1.x, p2.x].sort((a, b) => a - b);
+            let [minY, maxY] = [p1.y, p2.y].sort((a, b) => a - b);
+
+            let interpolatedX = minX + (maxX - minX) / 2;
+            let interpolatedY = minY + (maxY - minY) / 2;
+
+            let newPoint = { x: interpolatedX, y: interpolatedY };
+
+            let t1 = [p0, p1, newPoint];
+            let t2 = [p0, p2, newPoint];
+
+            t1.unshift(t1.pop()!);
+            t2.unshift(t2.pop()!);
+
+            polygons.push(t1, t2);
+
+            return shuffle(polygons, p0.x + p1.y + p2.x);
+        };
+
+        const isPointInTriangle = (point: Coordinate, triangle: Polygon) => {
+            // https://stackoverflow.com/a/2049593/13996389
+            const sign = (p1: Coordinate, p2: Coordinate, p3: Coordinate) => {
+                return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+            };
+
+            const d1 = sign(point, triangle[0], triangle[1]);
+            const d2 = sign(point, triangle[1], triangle[2]);
+            const d3 = sign(point, triangle[2], triangle[0]);
+
+            const has_neg = d1 < 0 || d2 < 0 || d3 < 0;
+            const has_pos = d1 > 0 || d2 > 0 || d3 > 0;
+
+            return !(has_neg && has_pos);
+        };
+
+        const drawPolygon = (polygon: Polygon) => {
+            ctx.moveTo(polygon[0].x * size, polygon[0].y * size);
+            ctx.beginPath();
+            for (let i = 0; i < polygon.length; i++) {
+                ctx.lineTo(polygon[i].x * size, polygon[i].y * size);
+            }
+            ctx.lineTo(polygon[0].x * size, polygon[0].y * size);
+            ctx.stroke();
+        };
+
+        let scaleUp = (polygon: Polygon, amount: number) => {
+            return polygon.map(({ x, y }) => ({
+                x: x * amount,
+                y: y * amount,
+            }));
+        };
+
+        const recursiveTriangulation = (
+            triangulation: Polygon[],
+            point: Coordinate,
+            depth: number
+        ) => {
+            if (depth <= 0) {
+                return;
+            }
+
+            let activeTriangle = triangulation.find((tri) =>
+                isPointInTriangle(point, scaleUp(tri, size))
+            );
+
+            if (activeTriangle === undefined) {
+                return;
+            }
+
+            drawPolygon(activeTriangle);
+
+            recursiveTriangulation(triangulateTriangle(activeTriangle), point, depth - 1);
+        };
+
+        const main = () => {
+            const polygon = generateConvexPolygon(6);
+            const triangulation = triangulateConvexPolygon(polygon);
+
+            drawPolygon(polygon);
+
+            canvas.addEventListener('mousemove', (e) => {
+                let screenSize = canvas.clientHeight;
+                let resolution = size / screenSize;
+
+                let x = e.offsetX * resolution;
+                let y = e.offsetY * resolution;
+
+                ctx.clearRect(0, 0, size, size);
+
+                drawPolygon(polygon);
+                recursiveTriangulation(triangulation, { x, y }, 15);
+            });
+        };
+
+        main();
+    },
 ];
 
 const LSLastLoadingBar = localStorage.getItem('last-loading-bar');
@@ -614,7 +875,7 @@ if (loadingBar !== null) {
     }
 }
 
-loadingBars[theme]();
+loadingBars[5]();
 localStorage.setItem('last-loading-bar', theme.toString());
 
 export {};
