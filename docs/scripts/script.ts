@@ -738,7 +738,7 @@ const loadingBars = [
             let triangles: Polygon[] = [];
             // connect everysingle vertex to the 0th vertex
             for (let i = 1; i < polygon.length - 1; i++) {
-                let points = [polygon[0], polygon[i], polygon[i + 1]];
+                const points = [polygon[0], polygon[i], polygon[i + 1]];
                 triangles.push(shuffle(points));
             }
 
@@ -756,9 +756,9 @@ const loadingBars = [
                 y: (polygon[0].y + polygon[1].y + polygon[2].y) / 3,
             };
 
-            let p1 = [polygon[0], polygon[1], centroid];
-            let p2 = [polygon[1], polygon[2], centroid];
-            let p3 = [polygon[2], polygon[0], centroid];
+            const p1 = [polygon[0], polygon[1], centroid];
+            const p2 = [polygon[1], polygon[2], centroid];
+            const p3 = [polygon[2], polygon[0], centroid];
 
             return [p1, p2, p3];
         };
@@ -808,7 +808,7 @@ const loadingBars = [
             depth: number,
             gradientColor: string[]
         ) => {
-            let activeTriangle = triangulation.find((tri) =>
+            const activeTriangle = triangulation.find((tri) =>
                 isPointInTriangle(point, scaleUp(tri, size))
             );
 
@@ -840,7 +840,7 @@ const loadingBars = [
 
             drawPolygon(polygon, undefined, true);
 
-            let gradientColor1 = [
+            const purpleGradient = [
                 'rgb(50, 0, 100)',
                 'rgb(100, 0, 100)',
                 'rgb(175, 20, 130)',
@@ -849,16 +849,19 @@ const loadingBars = [
                 'rgb(250, 150, 170)',
             ];
 
-            let gradientColor2 = ['#E24125', '#E5612A', '#E8812F', '#ECA035', '#EFC03A', '#F2E03F'];
+            const hotGradient = ['#E24125', '#E5612A', '#E8812F', '#ECA035', '#EFC03A', '#F2E03F'];
 
-            let gradientColor = [gradientColor1, gradientColor2][Date.now() % 2];
+            const linear_bmy = ['#f5f84d', '#fcb237', '#f76157', '#c40e82', '#5e1692'];
+
+            const gradientColors = [purpleGradient, hotGradient, linear_bmy];
+            const gradientColor = gradientColors[Math.floor(gradientColors.length * Math.random())];
 
             canvas.addEventListener('mousemove', (e) => {
-                let screenSize = canvas.clientHeight;
-                let resolution = size / screenSize;
+                const screenSize = canvas.clientHeight;
+                const resolution = size / screenSize;
 
-                let x = e.offsetX * resolution;
-                let y = e.offsetY * resolution;
+                const x = e.offsetX * resolution;
+                const y = e.offsetY * resolution;
 
                 ctx.clearRect(0, 0, size, size);
 
