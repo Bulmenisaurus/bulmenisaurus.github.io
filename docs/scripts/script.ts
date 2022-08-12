@@ -841,7 +841,7 @@ const loadingBars = [
             const polygon = generateConvexPolygon(6);
             const triangulation = triangulateConvexPolygon(polygon);
 
-            drawPolygon(polygon);
+            drawPolygon(polygon, undefined, true);
 
             canvas.addEventListener('mousemove', (e) => {
                 let screenSize = canvas.clientHeight;
