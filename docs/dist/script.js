@@ -564,22 +564,20 @@ const loadingBars = [
             }
             return shuffle(triangles);
         };
+        /**
+         * Finds the centroid of the triangle, and finds the three triangles by connecting this centroid
+         * to the three vertices of a triangle.
+         * Source: http://jwilson.coe.uga.edu/emt668/EMAT6680.2000/Lehman/emat6690/trisecttri%27s/whywork.html
+         */
         const triangulateTriangle = (polygon) => {
-            let polygons = [];
-            let p0 = polygon[0];
-            let p1 = polygon[1];
-            let p2 = polygon[2];
-            let [minX, maxX] = [p1.x, p2.x].sort((a, b) => a - b);
-            let [minY, maxY] = [p1.y, p2.y].sort((a, b) => a - b);
-            let interpolatedX = minX + (maxX - minX) / 2;
-            let interpolatedY = minY + (maxY - minY) / 2;
-            let newPoint = { x: interpolatedX, y: interpolatedY };
-            let t1 = [p0, p1, newPoint];
-            let t2 = [p0, p2, newPoint];
-            t1.unshift(t1.pop());
-            t2.unshift(t2.pop());
-            polygons.push(t1, t2);
-            return shuffle(polygons, p0.x + p1.y + p2.x);
+            const centroid = {
+                x: (polygon[0].x + polygon[1].x + polygon[2].x) / 3,
+                y: (polygon[0].y + polygon[1].y + polygon[2].y) / 3,
+            };
+            let p1 = [polygon[0], polygon[1], centroid];
+            let p2 = [polygon[1], polygon[2], centroid];
+            let p3 = [polygon[2], polygon[0], centroid];
+            return [p1, p2, p3];
         };
         const isPointInTriangle = (point, triangle) => {
             // https://stackoverflow.com/a/2049593/13996389
@@ -593,14 +591,20 @@ const loadingBars = [
             const has_pos = d1 > 0 || d2 > 0 || d3 > 0;
             return !(has_neg && has_pos);
         };
-        const drawPolygon = (polygon) => {
+        const drawPolygon = (polygon, fillColor, stroke) => {
             ctx.moveTo(polygon[0].x * size, polygon[0].y * size);
             ctx.beginPath();
             for (let i = 0; i < polygon.length; i++) {
                 ctx.lineTo(polygon[i].x * size, polygon[i].y * size);
             }
             ctx.lineTo(polygon[0].x * size, polygon[0].y * size);
-            ctx.stroke();
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+            if (stroke)
+                ctx.stroke();
+            if (fillColor !== undefined) {
+                ctx.fillStyle = fillColor;
+                ctx.fill();
+            }
         };
         let scaleUp = (polygon, amount) => {
             return polygon.map(({ x, y }) => ({
@@ -609,14 +613,25 @@ const loadingBars = [
             }));
         };
         const recursiveTriangulation = (triangulation, point, depth) => {
-            if (depth <= 0) {
-                return;
-            }
             let activeTriangle = triangulation.find((tri) => isPointInTriangle(point, scaleUp(tri, size)));
             if (activeTriangle === undefined) {
                 return;
             }
-            drawPolygon(activeTriangle);
+            let gradientColor = [
+                'rgb(50, 0, 100)',
+                'rgb(100, 0, 100)',
+                'rgb(175, 20, 130)',
+                'rgb(200, 40, 140)',
+                'rgb(230, 100, 150)',
+                'rgb(250, 150, 170)',
+            ];
+            if (depth <= gradientColor.length - 1) {
+                drawPolygon(activeTriangle, gradientColor[depth]);
+            }
+            if (depth <= 0) {
+                return;
+            }
+            triangulation.forEach((p) => drawPolygon(p));
             recursiveTriangulation(triangulateTriangle(activeTriangle), point, depth - 1);
         };
         const main = () => {
@@ -629,8 +644,8 @@ const loadingBars = [
                 let x = e.offsetX * resolution;
                 let y = e.offsetY * resolution;
                 ctx.clearRect(0, 0, size, size);
-                drawPolygon(polygon);
-                recursiveTriangulation(triangulation, { x, y }, 15);
+                drawPolygon(polygon, undefined, true);
+                recursiveTriangulation(triangulation, { x, y }, 4);
             });
         };
         main();
@@ -653,7 +668,7 @@ if (loadingBar !== null) {
         theme = parsed;
     }
 }
-loadingBars[5]();
+loadingBars[theme]();
 localStorage.setItem('last-loading-bar', theme.toString());
 export {};
 //# sourceMappingURL=script.js.map
