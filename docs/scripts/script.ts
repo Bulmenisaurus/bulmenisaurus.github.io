@@ -805,7 +805,8 @@ const loadingBars = [
         const recursiveTriangulation = (
             triangulation: Polygon[],
             point: Coordinate,
-            depth: number
+            depth: number,
+            gradientColor: string[]
         ) => {
             let activeTriangle = triangulation.find((tri) =>
                 isPointInTriangle(point, scaleUp(tri, size))
@@ -814,15 +815,6 @@ const loadingBars = [
             if (activeTriangle === undefined) {
                 return;
             }
-
-            let gradientColor = [
-                'rgb(50, 0, 100)',
-                'rgb(100, 0, 100)',
-                'rgb(175, 20, 130)',
-                'rgb(200, 40, 140)',
-                'rgb(230, 100, 150)',
-                'rgb(250, 150, 170)',
-            ];
 
             if (depth <= gradientColor.length - 1) {
                 drawPolygon(activeTriangle, gradientColor[depth]);
@@ -834,7 +826,12 @@ const loadingBars = [
 
             triangulation.forEach((p) => drawPolygon(p));
 
-            recursiveTriangulation(triangulateTriangle(activeTriangle), point, depth - 1);
+            recursiveTriangulation(
+                triangulateTriangle(activeTriangle),
+                point,
+                depth - 1,
+                gradientColor
+            );
         };
 
         const main = () => {
@@ -842,6 +839,19 @@ const loadingBars = [
             const triangulation = triangulateConvexPolygon(polygon);
 
             drawPolygon(polygon, undefined, true);
+
+            let gradientColor1 = [
+                'rgb(50, 0, 100)',
+                'rgb(100, 0, 100)',
+                'rgb(175, 20, 130)',
+                'rgb(200, 40, 140)',
+                'rgb(230, 100, 150)',
+                'rgb(250, 150, 170)',
+            ];
+
+            let gradientColor2 = ['#E24125', '#E5612A', '#E8812F', '#ECA035', '#EFC03A', '#F2E03F'];
+
+            let gradientColor = [gradientColor1, gradientColor2][Date.now() % 2];
 
             canvas.addEventListener('mousemove', (e) => {
                 let screenSize = canvas.clientHeight;
@@ -853,7 +863,7 @@ const loadingBars = [
                 ctx.clearRect(0, 0, size, size);
 
                 drawPolygon(polygon, undefined, true);
-                recursiveTriangulation(triangulation, { x, y }, 4);
+                recursiveTriangulation(triangulation, { x, y }, 4, gradientColor);
             });
         };
 
