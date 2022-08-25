@@ -123,12 +123,31 @@ const loadingBars = [
             });
             yield split(array, 0, array.length - 1);
         });
+        const BubbleSort = (toSort) => __awaiter(void 0, void 0, void 0, function* () {
+            let array = [...toSort];
+            for (let i = 0; i < array.length; i++) {
+                for (let j = 0; j < array.length - i - 1; j++) {
+                    if (array[j] > array[j + 1]) {
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                    }
+                    render(array);
+                    yield sleep(20);
+                }
+            }
+        });
         yield sleep(100);
+        let i = 0;
         while (true) {
             const indices = yield shuffle(data.map((_, idx) => idx));
             yield sleep(1000);
-            yield MergeSort(indices);
+            if (i % 2 === 0) {
+                yield MergeSort(indices);
+            }
+            else {
+                yield BubbleSort(indices);
+            }
             yield sleep(2000);
+            i++;
         }
     }),
     () => {
@@ -716,7 +735,7 @@ if (loadingBar !== null) {
         theme = parsed;
     }
 }
-loadingBars[theme]();
+loadingBars[1]();
 localStorage.setItem('last-loading-bar', theme.toString());
 export {};
 //# sourceMappingURL=script.js.map

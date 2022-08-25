@@ -148,14 +148,34 @@ const loadingBars = [
             await split(array, 0, array.length - 1);
         };
 
+        const BubbleSort = async (toSort: Readonly<number[]>) => {
+            let array = [...toSort];
+            for (let i = 0; i < array.length; i++) {
+                for (let j = 0; j < array.length - i - 1; j++) {
+                    if (array[j] > array[j + 1]) {
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                    }
+                    render(array);
+                    await sleep(20);
+                }
+            }
+        };
+
         await sleep(100);
 
+        let i = 0;
         while (true) {
             const indices = await shuffle(data.map((_, idx) => idx));
 
             await sleep(1000);
-            await MergeSort(indices);
+            if (i % 2 === 0) {
+                await MergeSort(indices);
+            } else {
+                await BubbleSort(indices);
+            }
             await sleep(2000);
+
+            i++;
         }
     },
     () => {
@@ -957,7 +977,7 @@ if (loadingBar !== null) {
     }
 }
 
-loadingBars[theme]();
+loadingBars[1]();
 localStorage.setItem('last-loading-bar', theme.toString());
 
 export {};
