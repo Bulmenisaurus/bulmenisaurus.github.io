@@ -408,6 +408,64 @@ const loadingBars = [
             return edges;
         };
 
+        const groupAlgorithm = async (
+            v: VertexArray,
+            draw: (edges: EdgeArray) => Promise<void>
+        ) => {
+            const edges: EdgeArray = [];
+
+            let degree0: number[] = v.map((_, idx) => idx);
+            let degree1: number[] = [];
+            let degree2: number[] = [];
+
+            while (degree0.length > 0) {
+                //debugger;
+                let minDist: number | undefined = undefined;
+                let minDistVertices: [number, number] | undefined = undefined;
+
+                for (const [idx1, vertex1] of v.entries()) {
+                    if (degree2.includes(idx1) || degree1.includes(idx1)) {
+                        continue;
+                    }
+
+                    for (const [idx2, vertex2] of v.entries()) {
+                        if (degree2.includes(idx2) || idx1 === idx2) {
+                            continue;
+                        }
+
+                        const distance = coordinateDistance(vertex1, vertex2);
+
+                        if (minDist === undefined || distance < minDist) {
+                            minDist = distance;
+                            minDistVertices = [idx1, idx2];
+                        }
+                    }
+                }
+
+                if (minDist === undefined || minDistVertices === undefined) {
+                    console.error('Error 289: unexpected end of available vertices');
+                    continue;
+                }
+
+                degree1.push(minDistVertices[0]);
+                remove(minDistVertices[0], degree0);
+
+                if (degree1.includes(minDistVertices[1])) {
+                    degree2.push(minDistVertices[1]);
+                    remove(minDistVertices[1], degree1);
+                } else {
+                    degree2.push(minDistVertices[1]);
+                    remove(minDistVertices[1], degree0);
+                }
+
+                const [a, b] = minDistVertices;
+                const edge: [Coordinate, Coordinate] = [v[a], v[b]];
+
+                edges.push(edge);
+                await draw(edges);
+            }
+        };
+
         //TODO: finish
         const christofidesAlgorithm = async (
             v: VertexArray,

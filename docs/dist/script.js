@@ -310,6 +310,50 @@ const loadingBars = [
             yield draw(edges);
             return edges;
         });
+        const groupAlgorithm = (v, draw) => __awaiter(void 0, void 0, void 0, function* () {
+            const edges = [];
+            let degree0 = v.map((_, idx) => idx);
+            let degree1 = [];
+            let degree2 = [];
+            while (degree0.length > 0) {
+                //debugger;
+                let minDist = undefined;
+                let minDistVertices = undefined;
+                for (const [idx1, vertex1] of v.entries()) {
+                    if (degree2.includes(idx1) || degree1.includes(idx1)) {
+                        continue;
+                    }
+                    for (const [idx2, vertex2] of v.entries()) {
+                        if (degree2.includes(idx2) || idx1 === idx2) {
+                            continue;
+                        }
+                        const distance = coordinateDistance(vertex1, vertex2);
+                        if (minDist === undefined || distance < minDist) {
+                            minDist = distance;
+                            minDistVertices = [idx1, idx2];
+                        }
+                    }
+                }
+                if (minDist === undefined || minDistVertices === undefined) {
+                    console.error('Error 289: unexpected end of available vertices');
+                    continue;
+                }
+                degree1.push(minDistVertices[0]);
+                remove(minDistVertices[0], degree0);
+                if (degree1.includes(minDistVertices[1])) {
+                    degree2.push(minDistVertices[1]);
+                    remove(minDistVertices[1], degree1);
+                }
+                else {
+                    degree2.push(minDistVertices[1]);
+                    remove(minDistVertices[1], degree0);
+                }
+                const [a, b] = minDistVertices;
+                const edge = [v[a], v[b]];
+                edges.push(edge);
+                yield draw(edges);
+            }
+        });
         //TODO: finish
         const christofidesAlgorithm = (v, draw) => __awaiter(void 0, void 0, void 0, function* () {
             // Minimum spanning tree
