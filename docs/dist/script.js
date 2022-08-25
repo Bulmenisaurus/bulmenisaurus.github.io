@@ -735,7 +735,7 @@ if (loadingBar !== null) {
         theme = parsed;
     }
 }
-loadingBars[1]();
+loadingBars[theme]();
 localStorage.setItem('last-loading-bar', theme.toString());
 export {};
 //# sourceMappingURL=script.js.map
