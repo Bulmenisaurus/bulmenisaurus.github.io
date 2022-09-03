@@ -34,14 +34,16 @@ const updateRow = (g, rowIdx, width, ruleIdx) => {
     const grid = [...g];
     let previousRow = rowIdx - 1;
     let startRowIdx = width * previousRow;
-    for (let i = 1; i <= width - 2; i++) {
-        let previousRowValue = grid[startRowIdx + i - 1] * 2 ** 2 +
-            grid[startRowIdx + i + 0] * 2 ** 1 +
-            grid[startRowIdx + i + 1] * 2 ** 0;
+    for (let i = 2; i <= width - 3; i++) {
+        let previousRowValue = grid[startRowIdx + i - 2] * 2 ** 4 +
+            grid[startRowIdx + i - 1] * 2 ** 3 +
+            grid[startRowIdx + i + 0] * 2 ** 2 +
+            grid[startRowIdx + i + 1] * 2 ** 1 +
+            grid[startRowIdx + i + 2] * 2 ** 0;
         if (grid[startRowIdx + i + 1] === undefined) {
             console.error('is undefined!!!');
         }
-        let cellValue = (ruleIdx & (2 ** previousRowValue)) >= 1 ? 1 : 0;
+        let cellValue = (ruleIdx & (BigInt(2) ** BigInt(previousRowValue))) >= 1 ? 1 : 0;
         grid[width * rowIdx + i] = cellValue;
     }
     return grid;
@@ -49,7 +51,7 @@ const updateRow = (g, rowIdx, width, ruleIdx) => {
 const main = (height, rule) => __awaiter(void 0, void 0, void 0, function* () {
     const canvas = document.createElement('canvas');
     const canvasSimulationHeight = height;
-    const canvasSimulationWidth = 1 + 2 * canvasSimulationHeight;
+    const canvasSimulationWidth = 1 + 4 * canvasSimulationHeight;
     const canvasRenderHeight = canvasSimulationHeight * 5;
     const canvasRenderWidth = canvasSimulationWidth * 5;
     canvas.width = canvasRenderWidth;
@@ -71,6 +73,21 @@ const main = (height, rule) => __awaiter(void 0, void 0, void 0, function* () {
         yield sleep(0);
     }
 });
-main(400, 90);
+const getSeed = () => {
+    let seed = Math.floor(Math.random() * (2 ** 32 - 1));
+    const url = new URLSearchParams(window.location.search);
+    const result = url.get('seed');
+    if (result === null) {
+        return seed;
+    }
+    const parsedResult = parseInt(result);
+    if (isNaN(parsedResult)) {
+        return seed;
+    }
+    return parsedResult;
+};
+const seed = getSeed();
+console.log({ seed });
+main(300, BigInt(seed));
 export {};
 //# sourceMappingURL=cellular-automaton.js.map

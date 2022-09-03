@@ -47,22 +47,24 @@ const drawRow = (
     }
 };
 
-const updateRow = (g: Readonly<CanvasGrid>, rowIdx: number, width: number, ruleIdx: number) => {
+const updateRow = (g: Readonly<CanvasGrid>, rowIdx: number, width: number, ruleIdx: bigint) => {
     const grid = [...g];
 
     let previousRow = rowIdx - 1;
     let startRowIdx = width * previousRow;
-    for (let i = 1; i <= width - 2; i++) {
+    for (let i = 2; i <= width - 3; i++) {
         let previousRowValue =
-            grid[startRowIdx + i - 1] * 2 ** 2 +
-            grid[startRowIdx + i + 0] * 2 ** 1 +
-            grid[startRowIdx + i + 1] * 2 ** 0;
+            grid[startRowIdx + i - 2] * 2 ** 4 +
+            grid[startRowIdx + i - 1] * 2 ** 3 +
+            grid[startRowIdx + i + 0] * 2 ** 2 +
+            grid[startRowIdx + i + 1] * 2 ** 1 +
+            grid[startRowIdx + i + 2] * 2 ** 0;
 
         if (grid[startRowIdx + i + 1] === undefined) {
             console.error('is undefined!!!');
         }
 
-        let cellValue = (ruleIdx & (2 ** previousRowValue)) >= 1 ? 1 : 0;
+        let cellValue = (ruleIdx & (BigInt(2) ** BigInt(previousRowValue))) >= 1 ? 1 : 0;
 
         grid[width * rowIdx + i] = cellValue;
     }
@@ -70,11 +72,11 @@ const updateRow = (g: Readonly<CanvasGrid>, rowIdx: number, width: number, ruleI
     return grid;
 };
 
-const main = async (height: number, rule: number) => {
+const main = async (height: number, rule: bigint) => {
     const canvas = document.createElement('canvas');
 
     const canvasSimulationHeight = height;
-    const canvasSimulationWidth = 1 + 2 * canvasSimulationHeight;
+    const canvasSimulationWidth = 1 + 4 * canvasSimulationHeight;
 
     const canvasRenderHeight = canvasSimulationHeight * 5;
     const canvasRenderWidth = canvasSimulationWidth * 5;
@@ -105,6 +107,29 @@ const main = async (height: number, rule: number) => {
     }
 };
 
-main(400, 90);
+const getSeed = () => {
+    let seed = Math.floor(Math.random() * (2 ** 32 - 1));
+
+    const url = new URLSearchParams(window.location.search);
+    const result = url.get('seed');
+
+    if (result === null) {
+        return seed;
+    }
+
+    const parsedResult = parseInt(result);
+
+    if (isNaN(parsedResult)) {
+        return seed;
+    }
+
+    return parsedResult;
+};
+
+const seed = getSeed();
+
+console.log({ seed });
+
+main(300, BigInt(seed));
 
 export {};
