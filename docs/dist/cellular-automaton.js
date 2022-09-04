@@ -86,8 +86,22 @@ const getSeed = () => {
     }
     return parsedResult;
 };
+const getHeight = () => {
+    let defaultHeight = 300;
+    const url = new URLSearchParams(window.location.search);
+    const result = url.get('height');
+    if (result === null) {
+        return defaultHeight;
+    }
+    const parsedResult = parseInt(result);
+    if (isNaN(parsedResult)) {
+        return defaultHeight;
+    }
+    return parsedResult;
+};
 const seed = getSeed();
-console.log({ seed });
-main(300, BigInt(seed));
+const height = getHeight();
+console.log({ seed, height });
+main(height, BigInt(seed));
 export {};
 //# sourceMappingURL=cellular-automaton.js.map
