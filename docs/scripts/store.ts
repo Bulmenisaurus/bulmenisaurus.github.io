@@ -29,7 +29,7 @@ function updateLink() {
     urlHidden = hideLinkUrl.toString();
 
     document.getElementById('link-preview')!.innerText = url;
-    document.querySelector('#copy-link-input')!.value = url;
+    (document.querySelector('#copy-link-input') as HTMLInputElement).value = url;
 }
 
 function copyLink() {

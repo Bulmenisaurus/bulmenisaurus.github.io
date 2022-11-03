@@ -3,14 +3,14 @@ declare var gtag: any;
 // &h=3&t=hallo&hide=true
 
 const urlParams2 = new URLSearchParams(window.location.search);
-const imageId = urlParams.get('h') || '1';
-let text = decodeURIComponent(urlParams.get('t')!);
+const imageId = urlParams2.get('h') || '1';
+let text = decodeURIComponent(urlParams2.get('t')!);
 
 // decodeUriComponent converts null to "null" for some reason
 if (text === 'null') {
     text = 'Happy valentines day!';
 }
-const hideLink = decodeURIComponent(urlParams.get('hide')!) || 'false';
+const hideLink = decodeURIComponent(urlParams2.get('hide')!) || 'false';
 gtag('event', 'view-card', {
     event_label: imageId,
 });
