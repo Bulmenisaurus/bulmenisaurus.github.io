@@ -1,0 +1,49 @@
+@charset "UTF-8";
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+body {
+  padding: 10px;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+canvas {
+  width: 80vmin;
+  image-rendering: crisp-edges;
+}
+
+#gui {
+  font-family: "JetBrains Mono", "Courier New", Courier, monospace;
+  display: flex;
+  width: 100%;
+  text-align: center;
+}
+
+#food, #deaths {
+  flex: 1;
+}
+#food::before, #deaths::before {
+  color: transparent;
+  text-shadow: 0 0 black;
+  margin-right: 3px;
+}
+
+#deaths::before {
+  content: "☠️";
+}
+
+#food::before {
+  content: "🍎";
+}
+
+.wrapper {
+  text-align: center;
+  min-width: 100px;
+}
+
+/*# sourceMappingURL=snake.css.map */
