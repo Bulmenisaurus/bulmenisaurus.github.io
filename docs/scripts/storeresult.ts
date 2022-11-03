@@ -11,9 +11,11 @@ if (text === 'null') {
     text = 'Happy valentines day!';
 }
 const hideLink = decodeURIComponent(urlParams2.get('hide')!) || 'false';
-gtag('event', 'view-card', {
-    event_label: imageId,
-});
+try {
+    gtag('event', 'view-card', {
+        event_label: imageId,
+    });
+} catch (e) {}
 
 document.getElementById('text')!.innerText = text.replace(/\n/g, '<br>');
 if (hideLink === 'true') {
