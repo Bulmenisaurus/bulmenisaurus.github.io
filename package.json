@@ -15,7 +15,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "build": "tsc",
-    "build:watch": "tsc -w && npx sass --watch docs/stylesheets/:docs/dist/",
+    "build:watch": "tsc -w & npx sass --watch docs/stylesheets/:docs/dist/",
     "create": "sh ./create.sh"
   },
   "repository": {
