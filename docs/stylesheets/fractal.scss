@@ -1,0 +1,17 @@
+@import 'mixins';
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    @include super-centered;
+    min-height: 100vh;
+    min-width: 100vw;
+}
+
+canvas {
+    height: 80vmin;
+    width: auto;
+}
