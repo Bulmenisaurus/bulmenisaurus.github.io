@@ -7,8 +7,6 @@ const placeholder_WasmRenderFunction = (
 ) => 0;
 
 type WasmRenderFunction = typeof placeholder_WasmRenderFunction;
-let a = () => {};
-type x = typeof a;
 
 // source: https://codeburst.io/throttling-and-debouncing-in-javascript-b01cad5c8edf
 const throttle = <FunctionType extends (...args: any[]) => void>(
@@ -43,6 +41,7 @@ class ControllableCanvas {
     reRender: () => void;
     deltaX: number;
     deltaY: number;
+    zoom: number;
     constructor(
         canvas: HTMLCanvasElement,
         ctx: CanvasRenderingContext2D,
@@ -58,6 +57,7 @@ class ControllableCanvas {
 
         this.width = 500;
         this.height = 500;
+        this.zoom = 1;
 
         this.isDragging = false;
         this.startDragX = 0;
@@ -74,14 +74,28 @@ class ControllableCanvas {
         canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
     }
 
-    //TODO: zoom
-    onWheel(e: WheelEvent) {}
-    //TODO: draggable navigation
+    onWheel(e: WheelEvent) {
+        const scrollAmount = e.deltaY;
+
+        /*
+        const isFirefox = navigator.userAgent.indexOf('Firefox') > 0;
+        return isFirefox ? 1.005 : 1.0006;
+        */
+
+        const base = 1.005;
+
+        this.zoom *= 1 / base ** scrollAmount;
+        console.log(this.zoom);
+
+        this.reRender();
+    }
+
     onMouseDown(e: MouseEvent) {
         this.isDragging = true;
         this.startDragX = e.offsetX;
         this.startDragY = e.offsetY;
     }
+
     onMouseUp(e: MouseEvent) {
         this.isDragging = false;
 
@@ -99,12 +113,10 @@ class ControllableCanvas {
 
         const canvasScreenSize = this.canvasElement.getBoundingClientRect();
 
-        this.deltaX = (e.offsetX - this.startDragX) * (1 / canvasScreenSize.width);
-        this.deltaY = (e.offsetY - this.startDragY) * (1 / canvasScreenSize.height);
+        this.deltaX = (e.offsetX - this.startDragX) * (1 / (canvasScreenSize.width * this.zoom));
+        this.deltaY = (e.offsetY - this.startDragY) * (1 / (canvasScreenSize.height * this.zoom));
 
         this.reRender();
-
-        // whole canvas is size * scale = 500 * 1/500 pixels
     }
 
     render() {
@@ -113,7 +125,7 @@ class ControllableCanvas {
             this.height,
             this.canvasX + this.deltaX,
             this.canvasY + this.deltaY,
-            1
+            this.zoom
         );
         const renderedData = new Uint8ClampedArray(
             this.memory.buffer,

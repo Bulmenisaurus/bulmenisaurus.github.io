@@ -136,9 +136,9 @@ fn get_pixel_color(
 }
 
 #[wasm_bindgen]
-pub fn render(width: i32, height: i32, offset_x: f64, offset_y: f64, zoom: i32) -> *const u8 {
+pub fn render(width: i32, height: i32, offset_x: f64, offset_y: f64, zoom: f64) -> *const u8 {
     let mut data = Vec::new();
-    let scale_factor: f64 = 1. / f64::from(width * zoom);
+    let scale_factor: f64 = 1. / (f64::from(width) * zoom);
 
     for y in 0..height {
         for x in 0..width {

@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const placeholder_WasmRenderFunction = (width, height, offsetX, offsetY, zoom) => 0;
-let a = () => { };
 // source: https://codeburst.io/throttling-and-debouncing-in-javascript-b01cad5c8edf
 const throttle = (func, delay) => {
     let beingThrottled = false;
@@ -32,6 +31,7 @@ class ControllableCanvas {
         this.memory = wasmMemory;
         this.width = 500;
         this.height = 500;
+        this.zoom = 1;
         this.isDragging = false;
         this.startDragX = 0;
         this.startDragY = 0;
@@ -43,9 +43,17 @@ class ControllableCanvas {
         canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
         canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
     }
-    //TODO: zoom
-    onWheel(e) { }
-    //TODO: draggable navigation
+    onWheel(e) {
+        const scrollAmount = e.deltaY;
+        /*
+        const isFirefox = navigator.userAgent.indexOf('Firefox') > 0;
+        return isFirefox ? 1.005 : 1.0006;
+        */
+        const base = 1.005;
+        this.zoom *= 1 / base ** scrollAmount;
+        console.log(this.zoom);
+        this.reRender();
+    }
     onMouseDown(e) {
         this.isDragging = true;
         this.startDragX = e.offsetX;
@@ -63,13 +71,12 @@ class ControllableCanvas {
             return;
         }
         const canvasScreenSize = this.canvasElement.getBoundingClientRect();
-        this.deltaX = (e.offsetX - this.startDragX) * (1 / canvasScreenSize.width);
-        this.deltaY = (e.offsetY - this.startDragY) * (1 / canvasScreenSize.height);
+        this.deltaX = (e.offsetX - this.startDragX) * (1 / (canvasScreenSize.width * this.zoom));
+        this.deltaY = (e.offsetY - this.startDragY) * (1 / (canvasScreenSize.height * this.zoom));
         this.reRender();
-        // whole canvas is size * scale = 500 * 1/500 pixels
     }
     render() {
-        const renderedDataPtr = this.renderFunction(this.width, this.height, this.canvasX + this.deltaX, this.canvasY + this.deltaY, 1);
+        const renderedDataPtr = this.renderFunction(this.width, this.height, this.canvasX + this.deltaX, this.canvasY + this.deltaY, this.zoom);
         const renderedData = new Uint8ClampedArray(this.memory.buffer, renderedDataPtr, this.width * this.height * 4);
         const imageData = this.ctx.createImageData(this.width, this.height);
         imageData.data.set(renderedData);
