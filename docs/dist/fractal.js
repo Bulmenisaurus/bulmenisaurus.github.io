@@ -9,16 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 const placeholder_WasmRenderFunction = (width, height, offsetX, offsetY, zoom) => 0;
 // source: https://codeburst.io/throttling-and-debouncing-in-javascript-b01cad5c8edf
-const throttle = (func, delay) => {
-    let beingThrottled = false;
+const debounce = (func, delay) => {
+    let debouncedId;
     return (...args) => {
-        if (!beingThrottled) {
+        window.clearTimeout(debouncedId);
+        debouncedId = window.setTimeout(() => {
             func(args);
-            beingThrottled = true;
-            setTimeout(() => {
-                beingThrottled = false;
-            }, delay);
-        }
+        }, delay);
     };
 };
 class ControllableCanvas {
@@ -37,7 +34,7 @@ class ControllableCanvas {
         this.startDragY = 0;
         this.deltaX = 0;
         this.deltaY = 0;
-        this.reRender = throttle(this.render.bind(this), 100);
+        this.reRender = debounce(this.render.bind(this), 100);
         canvas.addEventListener('wheel', (e) => this.onWheel(e));
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));

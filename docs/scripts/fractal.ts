@@ -9,20 +9,18 @@ const placeholder_WasmRenderFunction = (
 type WasmRenderFunction = typeof placeholder_WasmRenderFunction;
 
 // source: https://codeburst.io/throttling-and-debouncing-in-javascript-b01cad5c8edf
-const throttle = <FunctionType extends (...args: any[]) => void>(
+const debounce = <FunctionType extends (...args: any[]) => void>(
     func: FunctionType,
     delay: number
 ) => {
-    let beingThrottled: boolean = false;
+    let debouncedId: number | undefined;
 
     return (...args: Parameters<FunctionType>) => {
-        if (!beingThrottled) {
+        window.clearTimeout(debouncedId);
+
+        debouncedId = window.setTimeout(() => {
             func(args);
-            beingThrottled = true;
-            setTimeout(() => {
-                beingThrottled = false;
-            }, delay);
-        }
+        }, delay);
     };
 };
 
@@ -66,7 +64,7 @@ class ControllableCanvas {
         this.deltaX = 0;
         this.deltaY = 0;
 
-        this.reRender = throttle(this.render.bind(this), 100);
+        this.reRender = debounce(this.render.bind(this), 100);
 
         canvas.addEventListener('wheel', (e) => this.onWheel(e));
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
