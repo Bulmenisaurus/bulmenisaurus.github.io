@@ -69,7 +69,15 @@ fn strange_converge(c: Complex) -> bool {
     c.real.abs() < 10. || c.imaginary.abs() < 10.
 }
 
-fn get_pixel_color(x: i32, y: i32, width: i32, height: i32, scale_factor: f64) -> RGBA {
+fn get_pixel_color(
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
+    offset_x: f64,
+    offset_y: f64,
+    scale_factor: f64,
+) -> RGBA {
     let (mut a, mut c, mut e, mut f, mut g) = (
         Complex::default(),
         Complex::default(),
@@ -79,8 +87,8 @@ fn get_pixel_color(x: i32, y: i32, width: i32, height: i32, scale_factor: f64) -
     );
 
     let mut z = Complex {
-        real: f64::from(x - width / 2) * scale_factor,
-        imaginary: f64::from(y - height / 2) * scale_factor,
+        real: f64::from(x - width / 2) * scale_factor - offset_x,
+        imaginary: f64::from(y - height / 2) * scale_factor - offset_y,
     };
 
     // book suggests 0.35 + 0.35i
@@ -128,13 +136,13 @@ fn get_pixel_color(x: i32, y: i32, width: i32, height: i32, scale_factor: f64) -
 }
 
 #[wasm_bindgen]
-pub fn render(width: i32, height: i32, zoom: i32) -> *const u8 {
+pub fn render(width: i32, height: i32, offset_x: f64, offset_y: f64, zoom: i32) -> *const u8 {
     let mut data = Vec::new();
     let scale_factor: f64 = 1. / f64::from(width * zoom);
 
     for y in 0..height {
         for x in 0..width {
-            let pixel = get_pixel_color(x, y, width, height, scale_factor);
+            let pixel = get_pixel_color(x, y, width, height, offset_x, offset_y, scale_factor);
 
             data.extend(pixel.into_array())
         }
