@@ -7,7 +7,7 @@ const main = async () => {
         },
     };
     const module = await WebAssembly.instantiateStreaming(
-        fetch('../fractal-wasm/pkg/fractal_wasm_bg.wasm'),
+        fetch('./fractal-wasm/pkg/fractal_wasm_bg.wasm'),
         importObject
     );
 

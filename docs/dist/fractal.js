@@ -15,7 +15,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             },
         },
     };
-    const module = yield WebAssembly.instantiateStreaming(fetch('../fractal-wasm/pkg/fractal_wasm_bg.wasm'), importObject);
+    const module = yield WebAssembly.instantiateStreaming(fetch('./fractal-wasm/pkg/fractal_wasm_bg.wasm'), importObject);
     const render = module.instance.exports.render;
     const memory = module.instance.exports.memory;
     let time = Date.now();
