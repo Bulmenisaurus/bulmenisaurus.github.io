@@ -75,6 +75,9 @@ class ControllableCanvas {
     onWheel(e: WheelEvent) {
         const scrollAmount = e.deltaY;
 
+        // prevents zooming in entire page when pinch to scrolling
+        e.preventDefault();
+
         /*
         const isFirefox = navigator.userAgent.indexOf('Firefox') > 0;
         return isFirefox ? 1.005 : 1.0006;
