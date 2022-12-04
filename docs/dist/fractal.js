@@ -7,7 +7,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const placeholder_WasmRenderFunction = (width, height, offsetX, offsetY, zoom) => 0;
 // source: https://codeburst.io/throttling-and-debouncing-in-javascript-b01cad5c8edf
 const debounce = (func, delay) => {
     let debouncedId;
@@ -19,19 +18,19 @@ const debounce = (func, delay) => {
     };
 };
 class ControllableCanvas {
-    constructor(canvas, ctx, wasmRenderFunction, wasmMemory, debugFunction) {
+    constructor(canvas, ctx, worker, debugFunction) {
         this.canvasElement = canvas;
         this.ctx = ctx;
         this.canvasX = 0;
         this.canvasY = 0;
-        this.renderFunction = wasmRenderFunction;
-        this.memory = wasmMemory;
+        this.worker = worker;
         this.width = 500;
         this.height = 500;
         this.zoom = 1;
         this.isDragging = false;
         this.startDragX = 0;
         this.startDragY = 0;
+        this.startRender = 0;
         this.deltaX = 0;
         this.deltaY = 0;
         this.reRender = debounce(this.render.bind(this), 100);
@@ -40,6 +39,8 @@ class ControllableCanvas {
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
         canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+        worker.addEventListener('message', (e) => this.onMessage(e));
+        worker.addEventListener('error', (e) => console.error(e));
     }
     onWheel(e) {
         const scrollAmount = e.deltaY;
@@ -75,31 +76,32 @@ class ControllableCanvas {
         this.deltaY = (e.offsetY - this.startDragY) * (1 / (canvasScreenSize.height * this.zoom));
         this.reRender();
     }
-    render() {
-        const startDate = Date.now();
-        const renderedDataPtr = this.renderFunction(this.width, this.height, this.canvasX + this.deltaX, this.canvasY + this.deltaY, this.zoom);
-        const renderedData = new Uint8ClampedArray(this.memory.buffer, renderedDataPtr, this.width * this.height * 4);
+    onMessage(e) {
         const imageData = this.ctx.createImageData(this.width, this.height);
-        imageData.data.set(renderedData);
+        imageData.data.set(e.data);
         this.ctx.putImageData(imageData, 0, 0);
-        this.debug(`Took ${Date.now() - startDate}ms to render`);
+        //TODO: fix case where multiple
+        this.debug(`Took ${Date.now() - this.startRender}ms to render`);
+    }
+    render() {
+        this.startRender = Date.now();
+        this.worker.postMessage([
+            this.width,
+            this.height,
+            this.canvasX + this.deltaX,
+            this.canvasY + this.deltaY,
+            this.zoom,
+        ]);
     }
 }
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    const importObject = {
-        imports: {
-            render: placeholder_WasmRenderFunction,
-        },
-    };
-    const module = yield WebAssembly.instantiateStreaming(fetch('./fractal-wasm/pkg/fractal_wasm_bg.wasm'), importObject);
-    const render = module.instance.exports.render;
-    const memory = module.instance.exports.memory;
     const canvas = document.getElementById('main-canvas');
     const debugContainer = document.getElementById('debug');
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
-    const interactiveCanvas = new ControllableCanvas(canvas, ctx, render, memory, (e) => {
+    const renderThread = new Worker('./dist/fractal.worker.js');
+    const interactiveCanvas = new ControllableCanvas(canvas, ctx, renderThread, (e) => {
         debugContainer.innerText = e;
     });
     interactiveCanvas.render();

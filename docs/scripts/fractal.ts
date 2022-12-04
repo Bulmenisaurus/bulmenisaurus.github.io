@@ -1,13 +1,3 @@
-const placeholder_WasmRenderFunction = (
-    width: number,
-    height: number,
-    offsetX: number,
-    offsetY: number,
-    zoom: number
-) => 0;
-
-type WasmRenderFunction = typeof placeholder_WasmRenderFunction;
-
 // source: https://codeburst.io/throttling-and-debouncing-in-javascript-b01cad5c8edf
 const debounce = <FunctionType extends (...args: any[]) => void>(
     func: FunctionType,
@@ -29,8 +19,6 @@ class ControllableCanvas {
     canvasX: number;
     canvasY: number;
     isDragging: boolean;
-    renderFunction: WasmRenderFunction;
-    memory: WebAssembly.Memory;
     width: number;
     height: number;
     ctx: CanvasRenderingContext2D;
@@ -40,20 +28,20 @@ class ControllableCanvas {
     deltaX: number;
     deltaY: number;
     zoom: number;
-    debug: (a: string) => void;
+    worker: Worker;
+    debug: (message: string) => void;
+    startRender: number;
     constructor(
         canvas: HTMLCanvasElement,
         ctx: CanvasRenderingContext2D,
-        wasmRenderFunction: WasmRenderFunction,
-        wasmMemory: WebAssembly.Memory,
+        worker: Worker,
         debugFunction: (message: string) => void
     ) {
         this.canvasElement = canvas;
         this.ctx = ctx;
         this.canvasX = 0;
         this.canvasY = 0;
-        this.renderFunction = wasmRenderFunction;
-        this.memory = wasmMemory;
+        this.worker = worker;
 
         this.width = 500;
         this.height = 500;
@@ -62,6 +50,7 @@ class ControllableCanvas {
         this.isDragging = false;
         this.startDragX = 0;
         this.startDragY = 0;
+        this.startRender = 0;
 
         this.deltaX = 0;
         this.deltaY = 0;
@@ -73,6 +62,8 @@ class ControllableCanvas {
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
         canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+        worker.addEventListener('message', (e) => this.onMessage(e));
+        worker.addEventListener('error', (e) => console.error(e));
     }
 
     onWheel(e: WheelEvent) {
@@ -123,42 +114,27 @@ class ControllableCanvas {
         this.reRender();
     }
 
+    onMessage(e: MessageEvent<Uint8ClampedArray>) {
+        const imageData = this.ctx.createImageData(this.width, this.height);
+        imageData.data.set(e.data);
+        this.ctx.putImageData(imageData, 0, 0);
+        //TODO: fix case where multiple
+        this.debug(`Took ${Date.now() - this.startRender}ms to render`);
+    }
+
     render() {
-        const startDate = Date.now();
-        const renderedDataPtr = this.renderFunction(
+        this.startRender = Date.now();
+        this.worker.postMessage([
             this.width,
             this.height,
             this.canvasX + this.deltaX,
             this.canvasY + this.deltaY,
-            this.zoom
-        );
-        const renderedData = new Uint8ClampedArray(
-            this.memory.buffer,
-            renderedDataPtr,
-            this.width * this.height * 4
-        );
-
-        const imageData = this.ctx.createImageData(this.width, this.height);
-        imageData.data.set(renderedData);
-        this.ctx.putImageData(imageData, 0, 0);
-        this.debug(`Took ${Date.now() - startDate}ms to render`);
+            this.zoom,
+        ]);
     }
 }
 
 const main = async () => {
-    const importObject = {
-        imports: {
-            render: placeholder_WasmRenderFunction,
-        },
-    };
-    const module = await WebAssembly.instantiateStreaming(
-        fetch('./fractal-wasm/pkg/fractal_wasm_bg.wasm'),
-        importObject
-    );
-
-    const render = module.instance.exports.render as WasmRenderFunction;
-    const memory = module.instance.exports.memory as WebAssembly.Memory;
-
     const canvas = <HTMLCanvasElement>document.getElementById('main-canvas');
     const debugContainer = <HTMLPreElement>document.getElementById('debug');
 
@@ -167,7 +143,9 @@ const main = async () => {
     canvas.width = 500;
     canvas.height = 500;
 
-    const interactiveCanvas = new ControllableCanvas(canvas, ctx, render, memory, (e: string) => {
+    const renderThread = new Worker('./dist/fractal.worker.js');
+
+    const interactiveCanvas = new ControllableCanvas(canvas, ctx, renderThread, (e) => {
         debugContainer.innerText = e;
     });
     interactiveCanvas.render();
