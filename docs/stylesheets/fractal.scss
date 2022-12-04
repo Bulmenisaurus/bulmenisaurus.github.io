@@ -3,12 +3,38 @@
 * {
     margin: 0;
     padding: 0;
+    --side-bar-width: 200px;
+    --content-padding: 20px;
+    box-sizing: border-box;
 }
 
 body {
-    @include super-centered;
     min-height: 100vh;
     min-width: 100vw;
+}
+
+main {
+    @include super-centered;
+    margin-left: var(--side-bar-width);
+    height: 100vh;
+}
+
+aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: var(--side-bar-width);
+
+    /* making it stand out from the rest of the content */
+    border-right: 1px solid hsla(210, 18%, 87%, 1);
+    background-color: hsl(0, 0%, 96%);
+
+    padding: 10px;
+
+    input {
+        display: block;
+    }
 }
 
 canvas {

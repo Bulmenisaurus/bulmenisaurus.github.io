@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+    <!-- 
+        http://paulbourke.net/fractals/juliaset/
+        https://cglearn.eu/pub/advanced-computer-graphics/fractal-rendering
+     -->
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -9,9 +13,14 @@
         <script src="./dist/fractal.js" type="module" defer></script>
     </head>
     <body>
-        <div>
-            <canvas id="main-canvas"></canvas>
+        <aside>
             <pre id="debug"></pre>
-        </div>
+            <label>Real <input type="number" id="real" value="0.35" step="0.01" /></label>
+            <label>Imag <input type="number" id="imag" value="0.35" step="0.01" /></label>
+            <label>Resolution (px) <input type="number" id="resolution" value="500" /></label>
+        </aside>
+        <main>
+            <canvas id="main-canvas"></canvas>
+        </main>
     </body>
 </html>

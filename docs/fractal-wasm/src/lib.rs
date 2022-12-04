@@ -77,6 +77,8 @@ fn get_pixel_color(
     offset_x: f64,
     offset_y: f64,
     scale_factor: f64,
+    u_real: f64,
+    u_imag: f64,
 ) -> RGBA {
     let (mut a, mut c, mut e, mut f, mut g) = (
         Complex::default(),
@@ -93,8 +95,8 @@ fn get_pixel_color(
 
     // book suggests 0.35 + 0.35i
     let u = Complex {
-        real: 0.35,
-        imaginary: 0.35,
+        real: u_real,
+        imaginary: u_imag,
     };
 
     let amount_iterations = 50;
@@ -136,13 +138,31 @@ fn get_pixel_color(
 }
 
 #[wasm_bindgen]
-pub fn render(width: i32, height: i32, offset_x: f64, offset_y: f64, zoom: f64) -> *const u8 {
+pub fn render(
+    width: i32,
+    height: i32,
+    offset_x: f64,
+    offset_y: f64,
+    zoom: f64,
+    u_real: f64,
+    u_imag: f64,
+) -> *const u8 {
     let mut data = Vec::new();
     let scale_factor: f64 = 1. / (f64::from(width) * zoom);
 
     for y in 0..height {
         for x in 0..width {
-            let pixel = get_pixel_color(x, y, width, height, offset_x, offset_y, scale_factor);
+            let pixel = get_pixel_color(
+                x,
+                y,
+                width,
+                height,
+                offset_x,
+                offset_y,
+                scale_factor,
+                u_real,
+                u_imag,
+            );
 
             data.extend(pixel.into_array())
         }

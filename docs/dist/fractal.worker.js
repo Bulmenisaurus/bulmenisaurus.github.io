@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const placeholder_WasmRenderFunction = (width, height, offsetX, offsetY, zoom) => 0;
+const placeholder_WasmRenderFunction = (width, height, offsetX, offsetY, zoom, uReal, uImag) => 0;
 let render;
 let memory;
 let hasMainInitialized = false;
@@ -24,13 +24,12 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     memory = module.instance.exports.memory;
 });
 self.onmessage = (e) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(hasMainInitialized);
     if (!hasMainInitialized) {
         yield main();
         hasMainInitialized = true;
     }
-    const [width, height, offsetX, offsetY, zoom] = e.data;
-    const renderedDataPtr = render(width, height, offsetX, offsetY, zoom);
+    const [width, height, offsetX, offsetY, zoom, uReal, uImag] = e.data;
+    const renderedDataPtr = render(width, height, offsetX, offsetY, zoom, uReal, uImag);
     const renderedData = new Uint8ClampedArray(memory.buffer, renderedDataPtr, width * height * 4);
     postMessage(renderedData);
 });

@@ -3,7 +3,9 @@ const placeholder_WasmRenderFunction = (
     height: number,
     offsetX: number,
     offsetY: number,
-    zoom: number
+    zoom: number,
+    uReal: number,
+    uImag: number
 ) => 0;
 
 type WasmRenderFunction = typeof placeholder_WasmRenderFunction;
@@ -29,15 +31,14 @@ const main = async () => {
 };
 
 self.onmessage = async (e) => {
-    console.log(hasMainInitialized);
     if (!hasMainInitialized) {
         await main();
         hasMainInitialized = true;
     }
 
-    const [width, height, offsetX, offsetY, zoom] = e.data;
+    const [width, height, offsetX, offsetY, zoom, uReal, uImag] = e.data;
 
-    const renderedDataPtr = render(width, height, offsetX, offsetY, zoom);
+    const renderedDataPtr = render(width, height, offsetX, offsetY, zoom, uReal, uImag);
     const renderedData = new Uint8ClampedArray(memory.buffer, renderedDataPtr, width * height * 4);
 
     postMessage(renderedData);
