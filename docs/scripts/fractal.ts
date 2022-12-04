@@ -40,11 +40,13 @@ class ControllableCanvas {
     deltaX: number;
     deltaY: number;
     zoom: number;
+    debug: (a: string) => void;
     constructor(
         canvas: HTMLCanvasElement,
         ctx: CanvasRenderingContext2D,
         wasmRenderFunction: WasmRenderFunction,
-        wasmMemory: WebAssembly.Memory
+        wasmMemory: WebAssembly.Memory,
+        debugFunction: (message: string) => void
     ) {
         this.canvasElement = canvas;
         this.ctx = ctx;
@@ -65,6 +67,7 @@ class ControllableCanvas {
         this.deltaY = 0;
 
         this.reRender = debounce(this.render.bind(this), 100);
+        this.debug = debugFunction;
 
         canvas.addEventListener('wheel', (e) => this.onWheel(e));
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
@@ -121,6 +124,7 @@ class ControllableCanvas {
     }
 
     render() {
+        const startDate = Date.now();
         const renderedDataPtr = this.renderFunction(
             this.width,
             this.height,
@@ -137,6 +141,7 @@ class ControllableCanvas {
         const imageData = this.ctx.createImageData(this.width, this.height);
         imageData.data.set(renderedData);
         this.ctx.putImageData(imageData, 0, 0);
+        this.debug(`Took ${Date.now() - startDate}ms to render`);
     }
 }
 
@@ -155,13 +160,16 @@ const main = async () => {
     const memory = module.instance.exports.memory as WebAssembly.Memory;
 
     const canvas = <HTMLCanvasElement>document.getElementById('main-canvas');
+    const debugContainer = <HTMLPreElement>document.getElementById('debug');
 
     const ctx = canvas.getContext('2d')!;
 
     canvas.width = 500;
     canvas.height = 500;
 
-    const interactiveCanvas = new ControllableCanvas(canvas, ctx, render, memory);
+    const interactiveCanvas = new ControllableCanvas(canvas, ctx, render, memory, (e: string) => {
+        debugContainer.innerText = e;
+    });
     interactiveCanvas.render();
 };
 

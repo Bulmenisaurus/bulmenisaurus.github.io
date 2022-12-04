@@ -19,7 +19,7 @@ const debounce = (func, delay) => {
     };
 };
 class ControllableCanvas {
-    constructor(canvas, ctx, wasmRenderFunction, wasmMemory) {
+    constructor(canvas, ctx, wasmRenderFunction, wasmMemory, debugFunction) {
         this.canvasElement = canvas;
         this.ctx = ctx;
         this.canvasX = 0;
@@ -35,6 +35,7 @@ class ControllableCanvas {
         this.deltaX = 0;
         this.deltaY = 0;
         this.reRender = debounce(this.render.bind(this), 100);
+        this.debug = debugFunction;
         canvas.addEventListener('wheel', (e) => this.onWheel(e));
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
@@ -75,11 +76,13 @@ class ControllableCanvas {
         this.reRender();
     }
     render() {
+        const startDate = Date.now();
         const renderedDataPtr = this.renderFunction(this.width, this.height, this.canvasX + this.deltaX, this.canvasY + this.deltaY, this.zoom);
         const renderedData = new Uint8ClampedArray(this.memory.buffer, renderedDataPtr, this.width * this.height * 4);
         const imageData = this.ctx.createImageData(this.width, this.height);
         imageData.data.set(renderedData);
         this.ctx.putImageData(imageData, 0, 0);
+        this.debug(`Took ${Date.now() - startDate}ms to render`);
     }
 }
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -92,10 +95,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const render = module.instance.exports.render;
     const memory = module.instance.exports.memory;
     const canvas = document.getElementById('main-canvas');
+    const debugContainer = document.getElementById('debug');
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
-    const interactiveCanvas = new ControllableCanvas(canvas, ctx, render, memory);
+    const interactiveCanvas = new ControllableCanvas(canvas, ctx, render, memory, (e) => {
+        debugContainer.innerText = e;
+    });
     interactiveCanvas.render();
 });
 main();
