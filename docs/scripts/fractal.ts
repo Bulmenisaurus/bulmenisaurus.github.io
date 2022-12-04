@@ -141,6 +141,15 @@ class ControllableCanvas {
     }
 }
 
+const getConfigFromURLQuery = () => {
+    const queryString = new URLSearchParams(window.location.search);
+    return {
+        real: queryString.get('real'),
+        imag: queryString.get('imag'),
+        //TODO: maybe size?
+    };
+};
+
 const main = async () => {
     const canvas = <HTMLCanvasElement>document.getElementById('main-canvas');
     const debugContainer = <HTMLPreElement>document.getElementById('debug');
@@ -153,6 +162,15 @@ const main = async () => {
 
     canvas.width = 500;
     canvas.height = 500;
+
+    const { real: givenReal, imag: givenImag } = getConfigFromURLQuery();
+    if (givenReal !== null) {
+        realInput.value = givenReal;
+    }
+
+    if (givenImag !== null) {
+        imagInput.value = givenImag;
+    }
 
     const renderThread = new Worker('./dist/fractal.worker.js');
 

@@ -99,6 +99,14 @@ class ControllableCanvas {
         ]);
     }
 }
+const getConfigFromURLQuery = () => {
+    const queryString = new URLSearchParams(window.location.search);
+    return {
+        real: queryString.get('real'),
+        imag: queryString.get('imag'),
+        //TODO: maybe size?
+    };
+};
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const canvas = document.getElementById('main-canvas');
     const debugContainer = document.getElementById('debug');
@@ -108,6 +116,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
+    const { real: givenReal, imag: givenImag } = getConfigFromURLQuery();
+    if (givenReal !== null) {
+        realInput.value = givenReal;
+    }
+    if (givenImag !== null) {
+        imagInput.value = givenImag;
+    }
     const renderThread = new Worker('./dist/fractal.worker.js');
     const interactiveCanvas = new ControllableCanvas(canvas, ctx, renderThread, (e) => {
         debugContainer.innerText = e;
