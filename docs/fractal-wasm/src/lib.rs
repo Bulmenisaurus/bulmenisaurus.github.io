@@ -48,8 +48,8 @@ impl Complex {
         }
     }
 
-    fn magnitude(&self) -> f64 {
-        (self.real.powi(2) + self.imaginary.powi(2)).sqrt()
+    fn magnitude_squared(&self) -> f64 {
+        self.real.powi(2) + self.imaginary.powi(2)
     }
 }
 
@@ -62,7 +62,7 @@ impl Default for Complex {
     }
 }
 fn seems_to_converge(c: Complex) -> bool {
-    c.magnitude() < 10.
+    c.magnitude_squared() < 100.
 }
 
 fn strange_converge(c: Complex) -> bool {
