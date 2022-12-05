@@ -113,6 +113,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const realInput = document.getElementById('real');
     const imagInput = document.getElementById('imag');
     const resolutionInput = document.getElementById('resolution');
+    const zoomInput = document.getElementById('zoom');
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
@@ -131,6 +132,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         let realValue = parseFloat(realInput.value);
         let imagValue = parseFloat(imagInput.value);
         let resolutionValue = parseFloat(resolutionInput.value);
+        let zoomValue = parseFloat(zoomInput.value);
         if (isNaN(realValue)) {
             realValue = 0;
             realInput.value = '0';
@@ -145,6 +147,8 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }
         interactiveCanvas.u.real = realValue;
         interactiveCanvas.u.imag = imagValue;
+        interactiveCanvas.zoom = zoomValue / 10;
+        console.log({ realValue, imagValue, resolutionValue, zoomValue });
         // only change canvas dimensions if they are actually different,
         // since changing the size of the canvas erases it's contents.
         // clearing the canvas and rendering dark values rapidly makes the canvas blink
@@ -162,6 +166,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     realInput.addEventListener('change', () => paramChangeHandler());
     imagInput.addEventListener('change', () => paramChangeHandler());
     resolutionInput.addEventListener('change', () => paramChangeHandler());
+    zoomInput.addEventListener('input', () => paramChangeHandler());
     // only render after the config above has been set
     interactiveCanvas.render();
 });

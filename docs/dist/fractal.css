@@ -1,8 +1,6 @@
 * {
   margin: 0;
   padding: 0;
-  --side-bar-width: 200px;
-  --content-padding: 20px;
   box-sizing: border-box;
 }
 
@@ -14,23 +12,18 @@ body {
 main {
   display: grid;
   place-items: center;
-  margin-left: var(--side-bar-width);
   height: 100vh;
 }
 
-aside {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: var(--side-bar-width);
-  /* making it stand out from the rest of the content */
-  border-right: 1px solid hsl(210deg, 18%, 87%);
-  background-color: hsl(0deg, 0%, 96%);
-  padding: 10px;
+div#top {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  justify-content: space-around;
 }
-aside input {
-  display: block;
+div#top input {
+  margin: 0 5px;
+  vertical-align: bottom;
 }
 
 canvas {

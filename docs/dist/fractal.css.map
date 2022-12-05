@@ -1,1 +1,1 @@
-{"version":3,"sourceRoot":"","sources":["../stylesheets/fractal.scss","../stylesheets/_mixins.scss"],"names":[],"mappings":"AAEA;EACI;EACA;EACA;EACA;EACA;;;AAGJ;EACI;EACA;;;AAGJ;ECJQ;EACA;EDKJ;EACA;;;AAGJ;EACI;EACA;EACA;EACA;EACA;AAEA;EACA;EACA;EAEA;;AAEA;EACI;;;AAIR;EACI;EACA","file":"fractal.css"}
+{"version":3,"sourceRoot":"","sources":["../stylesheets/fractal.scss","../stylesheets/_mixins.scss"],"names":[],"mappings":"AAEA;EACI;EACA;EAEA;;;AAGJ;EACI;EACA;;;AAGJ;ECHQ;EACA;EDIJ;;;AAGJ;EACI;EACA;EACA;EACA;;AAEA;EACI;EACA;;;AAIR;EACI;EACA","file":"fractal.css"}

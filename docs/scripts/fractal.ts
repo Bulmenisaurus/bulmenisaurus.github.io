@@ -157,6 +157,7 @@ const main = async () => {
     const realInput = <HTMLInputElement>document.getElementById('real');
     const imagInput = <HTMLInputElement>document.getElementById('imag');
     const resolutionInput = <HTMLInputElement>document.getElementById('resolution');
+    const zoomInput = <HTMLInputElement>document.getElementById('zoom');
 
     const ctx = canvas.getContext('2d')!;
 
@@ -182,6 +183,7 @@ const main = async () => {
         let realValue = parseFloat(realInput.value);
         let imagValue = parseFloat(imagInput.value);
         let resolutionValue = parseFloat(resolutionInput.value);
+        let zoomValue = parseFloat(zoomInput.value);
 
         if (isNaN(realValue)) {
             realValue = 0;
@@ -200,6 +202,10 @@ const main = async () => {
 
         interactiveCanvas.u.real = realValue;
         interactiveCanvas.u.imag = imagValue;
+
+        interactiveCanvas.zoom = zoomValue / 10;
+
+        console.log({ realValue, imagValue, resolutionValue, zoomValue });
 
         // only change canvas dimensions if they are actually different,
         // since changing the size of the canvas erases it's contents.
@@ -221,6 +227,7 @@ const main = async () => {
     realInput.addEventListener('change', () => paramChangeHandler());
     imagInput.addEventListener('change', () => paramChangeHandler());
     resolutionInput.addEventListener('change', () => paramChangeHandler());
+    zoomInput.addEventListener('input', () => paramChangeHandler());
 
     // only render after the config above has been set
     interactiveCanvas.render();

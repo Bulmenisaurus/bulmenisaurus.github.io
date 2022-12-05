@@ -13,12 +13,17 @@
         <script src="./dist/fractal.js" type="module" defer></script>
     </head>
     <body>
-        <aside>
+        <div id="top">
             <pre id="debug"></pre>
-            <label>Real <input type="number" id="real" value="0.35" step="0.01" /></label>
-            <label>Imag <input type="number" id="imag" value="0.35" step="0.01" /></label>
+            <label
+                >Real <input type="range" id="real" value="0.35" step="0.01" min="-1" max="1"
+            /></label>
+            <label
+                >Imag <input type="range" id="imag" value="0.35" step="0.01" min="-1" max="1"
+            /></label>
+            <label> Zoom <input type="range" id="zoom" value="1" min="1" max="10" /> </label>
             <label>Resolution (px) <input type="number" id="resolution" value="500" /></label>
-        </aside>
+        </div>
         <main>
             <canvas id="main-canvas"></canvas>
         </main>
