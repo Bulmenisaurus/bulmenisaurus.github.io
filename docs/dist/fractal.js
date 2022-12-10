@@ -24,7 +24,7 @@ class ControllableCanvas {
         this.canvasX = 0;
         this.canvasY = 0;
         this.worker = worker;
-        this.width = 600;
+        this.width = 500;
         this.height = 500;
         this.zoom = 1;
         this.isDragging = false;
@@ -39,12 +39,26 @@ class ControllableCanvas {
         };
         this.reRender = debounce(this.render.bind(this), 100);
         this.debug = debugFunction;
+        this.resize();
+        const debouncedResize = debounce(this.resize.bind(this), 100);
+        window.addEventListener('resize', (e) => debouncedResize());
         canvas.addEventListener('wheel', (e) => this.onWheel(e));
         canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
         canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
         worker.addEventListener('message', (e) => this.onMessage(e));
         worker.addEventListener('error', (e) => console.error(e));
+    }
+    resize() {
+        const container = this.canvasElement.parentElement;
+        const containerSize = container.getBoundingClientRect();
+        const width = Math.round(containerSize.width);
+        const height = Math.round(containerSize.height);
+        this.canvasElement.width = width;
+        this.canvasElement.height = height;
+        this.width = width;
+        this.height = height;
+        this.reRender();
     }
     onWheel(e) {
         const scrollAmount = e.deltaY;
@@ -110,63 +124,74 @@ const getConfigFromURLQuery = () => {
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const canvas = document.getElementById('main-canvas');
     const debugContainer = document.getElementById('debug');
-    const realInput = document.getElementById('real');
-    const imagInput = document.getElementById('imag');
-    const resolutionInput = document.getElementById('resolution');
-    const zoomInput = document.getElementById('zoom');
+    const realTextInput = document.getElementById('real-input');
+    const realSlideInput = document.getElementById('real-slider');
+    const imagTextInput = document.getElementById('imag-input');
+    const imagSlideInput = document.getElementById('imag-slider');
+    const zoomTextInput = document.getElementById('zoom-input');
+    const zoomSlideInput = document.getElementById('zoom-input');
+    // const resolutionInput = <HTMLInputElement>document.getElementById('resolution');
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
     const { real: givenReal, imag: givenImag } = getConfigFromURLQuery();
     if (givenReal !== null) {
-        realInput.value = givenReal;
+        realTextInput.value = givenReal;
+        realSlideInput.value = givenReal;
     }
     if (givenImag !== null) {
-        imagInput.value = givenImag;
+        imagTextInput.value = givenImag;
+        imagSlideInput.value = givenImag;
     }
     const renderThread = new Worker('./dist/fractal.worker.js');
     const interactiveCanvas = new ControllableCanvas(canvas, ctx, renderThread, (e) => {
         debugContainer.innerText = e;
     });
-    const paramChangeHandler = (shouldReRender = true) => {
-        let realValue = parseFloat(realInput.value);
-        let imagValue = parseFloat(imagInput.value);
-        let resolutionValue = parseFloat(resolutionInput.value);
-        let zoomValue = parseFloat(zoomInput.value);
-        if (isNaN(realValue)) {
-            realValue = 0;
-            realInput.value = '0';
-        }
-        if (isNaN(imagValue)) {
-            imagValue = 0;
-            imagInput.value = '0';
-        }
-        if (isNaN(resolutionValue)) {
-            resolutionValue = 500;
-            resolutionInput.value = '500';
-        }
-        interactiveCanvas.u.real = realValue;
-        interactiveCanvas.u.imag = imagValue;
-        interactiveCanvas.zoom = zoomValue / 10;
-        console.log({ realValue, imagValue, resolutionValue, zoomValue });
-        // only change canvas dimensions if they are actually different,
-        // since changing the size of the canvas erases it's contents.
-        // clearing the canvas and rendering dark values rapidly makes the canvas blink
-        if (canvas.width !== resolutionValue) {
-            interactiveCanvas.width =
-                interactiveCanvas.height =
-                    canvas.width =
-                        canvas.height =
-                            resolutionValue;
-        }
-        interactiveCanvas.reRender();
+    const realTextInputChange = (r = true) => {
+        realSlideInput.value = realTextInput.value;
+        interactiveCanvas.u.real = parseFloat(realTextInput.value);
+        if (r)
+            interactiveCanvas.reRender();
     };
-    // don't render here at first
-    paramChangeHandler(false);
-    realInput.addEventListener('change', () => paramChangeHandler());
-    imagInput.addEventListener('change', () => paramChangeHandler());
-    resolutionInput.addEventListener('change', () => paramChangeHandler());
-    zoomInput.addEventListener('input', () => paramChangeHandler());
+    const realSlideInputChange = (r = true) => {
+        realTextInput.value = realSlideInput.value;
+        interactiveCanvas.u.real = parseFloat(realSlideInput.value);
+        if (r)
+            interactiveCanvas.reRender();
+    };
+    const imagTextInputChange = (r = true) => {
+        imagSlideInput.value = imagTextInput.value;
+        interactiveCanvas.u.imag = parseFloat(imagTextInput.value);
+        if (r)
+            interactiveCanvas.reRender();
+    };
+    const imagSlideInputChange = (r = true) => {
+        imagTextInput.value = imagSlideInput.value;
+        interactiveCanvas.u.imag = parseFloat(imagSlideInput.value);
+        if (r)
+            interactiveCanvas.reRender();
+    };
+    const zoomTextInputChange = (r = true) => {
+        zoomSlideInput.value = zoomTextInput.value;
+        interactiveCanvas.zoom = parseFloat(zoomTextInput.value);
+        if (r)
+            interactiveCanvas.reRender();
+    };
+    const zoomSlideInputChange = (r = true) => {
+        zoomTextInput.value = zoomSlideInput.value;
+        interactiveCanvas.zoom = parseFloat(zoomSlideInput.value);
+        if (r)
+            interactiveCanvas.reRender();
+    };
+    realTextInputChange(false);
+    imagTextInputChange(false);
+    zoomTextInputChange(false);
+    realTextInput.addEventListener('change', () => realTextInputChange());
+    realSlideInput.addEventListener('change', () => realSlideInputChange());
+    imagTextInput.addEventListener('change', () => imagTextInputChange());
+    imagSlideInput.addEventListener('change', () => imagSlideInputChange());
+    zoomTextInput.addEventListener('input', () => zoomTextInputChange());
+    zoomSlideInput.addEventListener('input', () => zoomSlideInputChange());
     // only render after the config above has been set
     interactiveCanvas.render();
 });
