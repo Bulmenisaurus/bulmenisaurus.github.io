@@ -12,7 +12,9 @@ const GameData = [
         snake: [...line(0, 60, -10, 60)],
         blocks: [...line(0, 0, 240, 0), ...line(0, 0, 240, 120), ...rectangle(50, 40, 190, 80)],
         goal: line(240, 50, 240, 70),
-        food: Array.from(new Set(randomDotsInRect(10, 20, 20, 230, 100, ...rectangle(50, 40, 190, 80)))),
+        food: Array.from(
+            new Set(randomDotsInRect(10, 20, 20, 230, 100, ...rectangle(50, 40, 190, 80)))
+        ),
         speed: 150,
     },
     {
@@ -74,8 +76,7 @@ function line(oldX, oldY, newX, newY) {
         for (let x = min; x <= max; x += 10) {
             result.push([x, newY]);
         }
-    }
-    else {
+    } else {
         const [min, max] = [oldY, newY].sort();
         for (let y = min; y <= max; y += 10) {
             result.push([newX, y]);
@@ -147,7 +148,9 @@ class Snake {
                 ateSomething = true;
                 this.eatenFoods.push(i);
                 this.game.score++;
-                this.game.setGameSpeed(Math.max(this.initialSpeed / 2, this.initialSpeed - this.game.score * 5));
+                this.game.setGameSpeed(
+                    Math.max(this.initialSpeed / 2, this.initialSpeed - this.game.score * 5)
+                );
             }
         }
         if (!ateSomething) {
@@ -162,14 +165,11 @@ class Snake {
         }
         if (['w', 'ArrowUp'].includes(key) && this.direction != 'down') {
             this.direction = 'up';
-        }
-        else if (['a', 'ArrowLeft'].includes(key) && this.direction != 'right') {
+        } else if (['a', 'ArrowLeft'].includes(key) && this.direction != 'right') {
             this.direction = 'left';
-        }
-        else if (['s', 'ArrowDown'].includes(key) && this.direction != 'up') {
+        } else if (['s', 'ArrowDown'].includes(key) && this.direction != 'up') {
             this.direction = 'down';
-        }
-        else if (['d', 'ArrowRight'].includes(key) && this.direction != 'left') {
+        } else if (['d', 'ArrowRight'].includes(key) && this.direction != 'left') {
             this.direction = 'right';
         }
         this.movedThisTick = true;
@@ -317,8 +317,7 @@ class Game {
     }
     updateFood() {
         const food = document.querySelector('#food');
-        if (food)
-            food.innerText = this.snake.eatenFoods.length + '/' + this.foods.length;
+        if (food) food.innerText = this.snake.eatenFoods.length + '/' + this.foods.length;
     }
     //! Start of level managment:
     setLevel(level) {

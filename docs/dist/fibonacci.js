@@ -26,7 +26,12 @@ const main = () => {
         for (let y = 0; y < fibonacciCavas.height / cellSideLength; y++) {
             ctx.fillStyle = 'black';
             if ((fibonacci(x) & (BigInt(1) << BigInt(y))) > BigInt(0)) {
-                ctx.fillRect(x * cellSideLength, y * cellSideLength, cellSideLength, cellSideLength);
+                ctx.fillRect(
+                    x * cellSideLength,
+                    y * cellSideLength,
+                    cellSideLength,
+                    cellSideLength
+                );
             }
         }
     }

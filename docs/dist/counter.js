@@ -1,13 +1,35 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
 var _a;
 const counterElement = document.getElementById('counter');
 const specificCounter = document.getElementById('specific-counter');
@@ -27,17 +49,17 @@ if (stored_counter !== null) {
 const toggleFullScreen = (element = document.body) => {
     if (fullscreen) {
         document.exitFullscreen();
-    }
-    else {
+    } else {
         element.requestFullscreen();
     }
     fullscreen = !fullscreen;
 };
-const copyCurrentCount = () => __awaiter(void 0, void 0, void 0, function* () {
-    // await so that if an error occurs, the next loc don't get executed
-    yield window.navigator.clipboard.writeText(count.toString());
-    counterColorAnimation('#00DC82');
-});
+const copyCurrentCount = () =>
+    __awaiter(void 0, void 0, void 0, function* () {
+        // await so that if an error occurs, the next loc don't get executed
+        yield window.navigator.clipboard.writeText(count.toString());
+        counterColorAnimation('#00DC82');
+    });
 const counterColorAnimation = (color, animationDuration = 1000) => {
     counterElement.style.transition = `0ms color`;
     counterElement.style.color = color;
@@ -52,11 +74,9 @@ const counterColorAnimation = (color, animationDuration = 1000) => {
 document.addEventListener('keydown', (e) => {
     if (e.key === ' ') {
         paused = !paused;
-    }
-    else if (e.key === 'f') {
+    } else if (e.key === 'f') {
         toggleFullScreen();
-    }
-    else if (e.key === 'c') {
+    } else if (e.key === 'c') {
         copyCurrentCount();
     }
 });

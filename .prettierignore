@@ -1,3 +1,4 @@
-dist/*.min.css
+dist/
 node_modules/
-*.min.js
+assets/
+fractal-wasm/

@@ -1,13 +1,35 @@
 //TODO: something like preact for dynamically re-rendering ui components
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
 const distance = (a, b) => Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 const lerp = (a, b, percentage) => a * (1 - percentage) + b * percentage;
 const lerpCoords = (a, b, amount) => ({
@@ -93,8 +115,7 @@ class Enemy {
         return this.health < 0;
     }
 }
-class SimpleEnemy extends Enemy {
-}
+class SimpleEnemy extends Enemy {}
 const GameEnemies = [];
 for (let i = 0; i < 10; i++) {
     GameEnemies.push(new SimpleEnemy(-i, i));
@@ -111,11 +132,9 @@ class Tower {
     }
     getEnemiesInRange(time, enemies, path, totalPathLength) {
         return enemies.filter((enemy) => {
-            if (enemy.dead)
-                return;
+            if (enemy.dead) return;
             const enemyPosition = enemy.getPositionInformation(time, path, totalPathLength);
-            if (enemyPosition === undefined)
-                return;
+            if (enemyPosition === undefined) return;
             const { location: enemyLocation } = enemyPosition;
             return distance(enemyLocation, this.location) <= this.range;
         });
@@ -131,17 +150,18 @@ class Tower {
         if (this.tickCoolDown !== 0) {
             return;
         }
-        if (closestEnemy === undefined)
-            return;
-        const enemyPosition = (_a = closestEnemy.getPositionInformation(time, path, totalPathLength)) === null || _a === void 0 ? void 0 : _a.location;
-        if (enemyPosition === undefined)
-            return;
+        if (closestEnemy === undefined) return;
+        const enemyPosition =
+            (_a = closestEnemy.getPositionInformation(time, path, totalPathLength)) === null ||
+            _a === void 0
+                ? void 0
+                : _a.location;
+        if (enemyPosition === undefined) return;
         const enemyAngle = angleOf(this.location, enemyPosition);
         return [new Bullet(this.location, enemyAngle, 400, time, this)];
     }
 }
-class SimpleTower extends Tower {
-}
+class SimpleTower extends Tower {}
 class MultiHitTower extends Tower {
     targetEnemies(time, enemies, path, totalPathLength) {
         this.tickCoolDown--;
@@ -191,7 +211,13 @@ class Game {
     }
     // runs every tick  for cleanup and stuff
     tick(time) {
-        this.projectiles = this.projectiles.filter((bullet) => isPointInRectangle(bullet.getPosition(time), { x: 0, y: 0 }, { x: this.gameWidth, y: this.gameHeight }));
+        this.projectiles = this.projectiles.filter((bullet) =>
+            isPointInRectangle(
+                bullet.getPosition(time),
+                { x: 0, y: 0 },
+                { x: this.gameWidth, y: this.gameHeight }
+            )
+        );
     }
     physics() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -204,9 +230,12 @@ class Game {
                     if (bullet.touchedIds.includes(enemy.id)) {
                         continue;
                     }
-                    const enemyPosition = enemy.getPositionInformation(time, this.path, this.totalPathLength);
-                    if (enemyPosition === undefined)
-                        continue;
+                    const enemyPosition = enemy.getPositionInformation(
+                        time,
+                        this.path,
+                        this.totalPathLength
+                    );
+                    if (enemyPosition === undefined) continue;
                     const dist = distance(bulletPosition, enemyPosition.location);
                     if (dist <= enemy.gameRadius && !enemy.dead) {
                         // Only counts the pops that made the enemies health go to 0
@@ -218,7 +247,12 @@ class Game {
             }
             // targeting
             for (const tower of this.towers) {
-                const bullets = tower.targetEnemies(time, GameEnemies, this.path, this.totalPathLength);
+                const bullets = tower.targetEnemies(
+                    time,
+                    GameEnemies,
+                    this.path,
+                    this.totalPathLength
+                );
                 if (bullets) {
                     this.projectiles.push(...bullets);
                 }
@@ -267,11 +301,16 @@ class Game {
                 }
                 // enemies
                 for (const enemy of GameEnemies) {
-                    if (enemy.dead)
-                        continue;
-                    const enemyPosition = (_a = enemy.getPositionInformation(time, this.path, this.totalPathLength)) === null || _a === void 0 ? void 0 : _a.location;
-                    if (enemyPosition === undefined)
-                        continue;
+                    if (enemy.dead) continue;
+                    const enemyPosition =
+                        (_a = enemy.getPositionInformation(
+                            time,
+                            this.path,
+                            this.totalPathLength
+                        )) === null || _a === void 0
+                            ? void 0
+                            : _a.location;
+                    if (enemyPosition === undefined) continue;
                     ctx.beginPath();
                     ctx.arc(enemyPosition.x, enemyPosition.y, enemy.gameRadius, 0, Math.PI * 2);
                     ctx.fillStyle = 'red';
@@ -288,14 +327,22 @@ class Game {
                     ctx.stroke();
                     ctx.fillStyle = 'black';
                     // 20 is the tower "hitbox"
-                    if (distance(this.mouseCoords, tower.location) <= 20 &&
-                        towerToDrawHighlight === undefined) {
+                    if (
+                        distance(this.mouseCoords, tower.location) <= 20 &&
+                        towerToDrawHighlight === undefined
+                    ) {
                         towerToDrawHighlight = tower;
                     }
                 }
                 if (towerToDrawHighlight !== undefined) {
                     ctx.beginPath();
-                    ctx.arc(towerToDrawHighlight.location.x, towerToDrawHighlight.location.y, towerToDrawHighlight.range, 0, Math.PI * 2);
+                    ctx.arc(
+                        towerToDrawHighlight.location.x,
+                        towerToDrawHighlight.location.y,
+                        towerToDrawHighlight.range,
+                        0,
+                        Math.PI * 2
+                    );
                     ctx.setLineDash([10, 10]);
                     ctx.stroke();
                     ctx.setLineDash([0]);
@@ -315,13 +362,23 @@ class Game {
     }
     onClick() {
         var _a;
-        const closestTowers = this.towers.sort((a, b) => distance(this.mouseCoords, a.location) - distance(this.mouseCoords, b.location));
+        const closestTowers = this.towers.sort(
+            (a, b) =>
+                distance(this.mouseCoords, a.location) - distance(this.mouseCoords, b.location)
+        );
         let currentSelectedTower;
-        if (closestTowers.length >= 1 &&
-            distance(closestTowers[0].location, this.mouseCoords) <= 20) {
+        if (
+            closestTowers.length >= 1 &&
+            distance(closestTowers[0].location, this.mouseCoords) <= 20
+        ) {
             currentSelectedTower = closestTowers[0];
         }
-        if (((_a = this.selectedTower) === null || _a === void 0 ? void 0 : _a.id) !== (currentSelectedTower === null || currentSelectedTower === void 0 ? void 0 : currentSelectedTower.id)) {
+        if (
+            ((_a = this.selectedTower) === null || _a === void 0 ? void 0 : _a.id) !==
+            (currentSelectedTower === null || currentSelectedTower === void 0
+                ? void 0
+                : currentSelectedTower.id)
+        ) {
             this.selectedTower = currentSelectedTower;
             this.renderTowerUI(currentSelectedTower);
         }

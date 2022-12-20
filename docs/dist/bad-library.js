@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 //! LIBRARY
 // utils
 const merge = (source, target) => {
@@ -6,8 +6,7 @@ const merge = (source, target) => {
         if (typeof source[key] === 'object') {
             target[key] = {};
             merge(source[key], target[key]);
-        }
-        else {
+        } else {
             target[key] = source[key];
         }
     });
@@ -19,8 +18,7 @@ const _elementFactory = (name) => {
         const elem = document.createElement(name);
         try {
             merge(options, elem);
-        }
-        catch (e) {
+        } catch (e) {
             console.error(`Error assigning props: ${e}`);
         }
         return (...args) => {
@@ -166,8 +164,7 @@ const define = (defaultProps, renderFunction) => {
 const dedent = (text) => {
     const value = text.raw.join('').trimEnd();
     const lines = value.split('\n');
-    if (lines[0].trim() === '')
-        lines.shift();
+    if (lines[0].trim() === '') lines.shift();
     let smallestIndent = undefined;
     for (const line of lines) {
         let indent = line.length - line.trimStart().length;
@@ -175,30 +172,81 @@ const dedent = (text) => {
             smallestIndent = indent;
         }
     }
-    if (smallestIndent === undefined)
-        return value;
+    if (smallestIndent === undefined) return value;
     return lines.map((l) => l.slice(smallestIndent)).join('\n');
 };
 const main = () => {
     const codeBlock = define({ lang: 'javascript' }, (props, children) => {
-        return preElem()(codeElem({
-            className: `language-${props.lang}`,
-            style: { whiteSpace: '' },
-            onrender: (e) => {
-                hljs.highlightElement(e);
-            },
-        })(...children));
+        return preElem()(
+            codeElem({
+                className: `language-${props.lang}`,
+                style: { whiteSpace: '' },
+                onrender: (e) => {
+                    hljs.highlightElement(e);
+                },
+            })(...children)
+        );
     });
     const tip = define({}, (props, children) => {
-        return divElem({ className: 'tip' })(pElem({ className: 'tip-header' })('Tip'), pElem()(...children));
+        return divElem({ className: 'tip' })(
+            pElem({ className: 'tip-header' })('Tip'),
+            pElem()(...children)
+        );
     });
     const marquee = define({}, (props, children) => {
-        return divElem({ className: 'marquee-container', style: {} })(divElem({ className: 'marquee' })(...children));
+        return divElem({ className: 'marquee-container', style: {} })(
+            divElem({ className: 'marquee' })(...children)
+        );
     });
-    body(h1Elem({ style: { fontWeight: 'bold' } })('Hello, World'), pElem()('bad-library.js is a bad library for making bad things! Here is the code for this page, for example: '), codeBlock()(main.toString()), pElem()('Everything starts with the ', codeElem()('body'), ' function, which is the entrypoint for your program'), codeBlock()(dedent `
+    body(
+        h1Elem({ style: { fontWeight: 'bold' } })('Hello, World'),
+        pElem()(
+            'bad-library.js is a bad library for making bad things! Here is the code for this page, for example: '
+        ),
+        codeBlock()(main.toString()),
+        pElem()(
+            'Everything starts with the ',
+            codeElem()('body'),
+            ' function, which is the entrypoint for your program'
+        ),
+        codeBlock()(dedent`
         body(
             h1Elem()("Hello, World!")
-        )`), tip()('You could just use ', codeElem()('document.body.append'), ", but it's a bad practice."), pElem()('Using html elements is simple as well! To find the function name you need,'), olElem()(liElem()('Find out the name of the element you want to use'), liElem()('Stick ', codeElem()('-elem'), ' on to the end'), liElem()('done!')), pElem()('To use your function, first call it with your attributes (such as style, href, etc)'), tip()("If you don't have any properties you can pass in an empty object or nothing at all, such as ", codeElem()('divElem()("don\'t look!")')), pElem()("Then, call the result of that with the content that the element has. This can be strings or other elements. Don't forget to separate it with commas! Here is an example:"), codeElem()("divElem({style: {color: 'red'}})('foo', strongElem()('bar'), emElem({style: {color: 'blue'}})('baz'))"), pElem()('This results in', divElem({ style: { color: 'red' } })('foo', strongElem()('bar'), emElem({ style: { color: 'blue' } })('baz'))), marquee()('And thats all for today folks!'));
+        )`),
+        tip()(
+            'You could just use ',
+            codeElem()('document.body.append'),
+            ", but it's a bad practice."
+        ),
+        pElem()('Using html elements is simple as well! To find the function name you need,'),
+        olElem()(
+            liElem()('Find out the name of the element you want to use'),
+            liElem()('Stick ', codeElem()('-elem'), ' on to the end'),
+            liElem()('done!')
+        ),
+        pElem()(
+            'To use your function, first call it with your attributes (such as style, href, etc)'
+        ),
+        tip()(
+            "If you don't have any properties you can pass in an empty object or nothing at all, such as ",
+            codeElem()('divElem()("don\'t look!")')
+        ),
+        pElem()(
+            "Then, call the result of that with the content that the element has. This can be strings or other elements. Don't forget to separate it with commas! Here is an example:"
+        ),
+        codeElem()(
+            "divElem({style: {color: 'red'}})('foo', strongElem()('bar'), emElem({style: {color: 'blue'}})('baz'))"
+        ),
+        pElem()(
+            'This results in',
+            divElem({ style: { color: 'red' } })(
+                'foo',
+                strongElem()('bar'),
+                emElem({ style: { color: 'blue' } })('baz')
+            )
+        ),
+        marquee()('And thats all for today folks!')
+    );
 };
 main();
 //# sourceMappingURL=bad-library.js.map

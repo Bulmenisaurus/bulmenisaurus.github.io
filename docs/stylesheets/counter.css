@@ -1,41 +1,41 @@
 body {
-  min-height: 100vh;
-  background-color: black;
-  display: grid;
-  place-items: center;
+    min-height: 100vh;
+    background-color: black;
+    display: grid;
+    place-items: center;
 }
 
 * {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 html {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 #counter-container {
-  text-align: center;
+    text-align: center;
 }
 #counter-container:hover > #specific-counter {
-  color: #999;
+    color: #999;
 }
 
 #counter-container > div {
-  font-variant-numeric: tabular-nums;
-  font-family: "fira code", Arial, Helvetica, sans-serif;
-  user-select: none;
+    font-variant-numeric: tabular-nums;
+    font-family: 'fira code', Arial, Helvetica, sans-serif;
+    user-select: none;
 }
 #counter-container > div#counter {
-  color: white;
-  font-size: 5em;
-  transition: 100ms color;
+    color: white;
+    font-size: 5em;
+    transition: 100ms color;
 }
 #counter-container > div#specific-counter {
-  color: black;
-  transition: 0.5s color;
+    color: black;
+    transition: 0.5s color;
 }
 
 #counter.green {
-  color: green;
+    color: green;
 }

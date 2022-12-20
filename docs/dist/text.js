@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 class Frame {
     constructor(width, height) {
         this.width = width;
@@ -43,8 +43,7 @@ class AsciiDocument {
      */
     updateFrameBetweenRenders(callback) {
         const lastFrame = this.lastFrame;
-        if (!lastFrame)
-            return;
+        if (!lastFrame) return;
         const originalCharacters = lastFrame.characters;
         lastFrame.characters = lastFrame.characters.map((p) => [...p]);
         callback(lastFrame);
@@ -115,8 +114,7 @@ const writeBlock = (frame, x, y, content, options) => {
     if (options.wrapping === 'wrap') {
         const wrappedText = wrapText(content, frame.width);
         lines = wrappedText.split('\n');
-    }
-    else {
+    } else {
         lines = content.split('\n');
     }
     for (let iy = 0; iy < lines.length; iy++) {
@@ -150,13 +148,25 @@ const asciiDocument = new AsciiDocument(document.body, (frame) => {
     const contentFrame = new Frame(frame.width - 3, frame.height - 3);
     const textContent = new Frame(contentFrame.width, Math.min(contentFrame.width, 20));
     // https://patorjk.com/software/taag/#p=display&f=Cybermedium&t=WELCOME
-    writeBlock(textContent, 0, 0, centerBlock(`_ _ _ ____ _    ____ ____ _  _ ____ 
+    writeBlock(
+        textContent,
+        0,
+        0,
+        centerBlock(
+            `_ _ _ ____ _    ____ ____ _  _ ____ 
 | | | |___ |    |    |  | |\\/| |___ 
-|_|_| |___ |___ |___ |__| |  | |___ `, textContent.width), { wrapping: 'clip' });
+|_|_| |___ |___ |___ |__| |  | |___ `,
+            textContent.width
+        ),
+        { wrapping: 'clip' }
+    );
     const content = `\
 Text.js is a revolutionary new framework that allows you to do cool stuff`;
     writeBlock(textContent, 0, 5, content, { wrapping: 'wrap' });
-    const testimonials = new Frame(contentFrame.width - 1, contentFrame.height - textContent.height);
+    const testimonials = new Frame(
+        contentFrame.width - 1,
+        contentFrame.height - textContent.height
+    );
     // fill(testimonials, '┼');
     // add paragraph
     writeFrame(contentFrame, 0, 0, textContent);
@@ -178,8 +188,10 @@ window.addEventListener('mousemove', (e) => {
     const mouseDocumentX = Math.floor(mouseX / 7.833333);
     const mouseDocumentY = Math.floor(mouseY / 16);
     asciiDocument.updateFrameBetweenRenders((frame) => {
-        if (frame.characters.length > mouseDocumentY &&
-            frame.characters[mouseDocumentY].length > mouseDocumentX) {
+        if (
+            frame.characters.length > mouseDocumentY &&
+            frame.characters[mouseDocumentY].length > mouseDocumentX
+        ) {
             frame.characters[mouseDocumentY][mouseDocumentX] = '~';
         }
     });

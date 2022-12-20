@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 let urlHidden = '';
 // reloads iframe because for some reason the iframe contents are kept through reloads
 // even though the src is different. Bug? Probably!
@@ -39,11 +39,15 @@ const modalClose = document.querySelector('#close-preview');
 const modalTrigger = document.querySelector('#open-preview');
 modalTrigger.onclick = function () {
     document.getElementById('preview-iframe').src = urlHidden;
-    document.getElementById('preview-iframe').addEventListener('load', () => {
-        modal.style.display = 'block';
-        modal.setAttribute('aria-hidden', 'false');
-        document.getElementById('preview-iframe').contentWindow.focus();
-    }, { once: true });
+    document.getElementById('preview-iframe').addEventListener(
+        'load',
+        () => {
+            modal.style.display = 'block';
+            modal.setAttribute('aria-hidden', 'false');
+            document.getElementById('preview-iframe').contentWindow.focus();
+        },
+        { once: true }
+    );
 };
 modalClose.onclick = function () {
     modal.style.display = 'none';

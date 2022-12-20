@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 // &h=3&t=hallo&hide=true
 const urlParams2 = new URLSearchParams(window.location.search);
 const imageId = urlParams2.get('h') || '1';
@@ -12,8 +12,7 @@ try {
     gtag('event', 'view-card', {
         event_label: imageId,
     });
-}
-catch (e) { }
+} catch (e) {}
 document.getElementById('text').innerText = text.replace(/\n/g, '<br>');
 if (hideLink === 'true') {
     document.querySelector('a').remove();
@@ -26,8 +25,7 @@ if (imageId != '9') {
     // image.alt = 'A fox and a bear sitting together.';
     image.height = 185 * 2;
     image.width = 300 * 2;
-}
-else if (imageId === '9') {
+} else if (imageId === '9') {
     const js = document.createElement('script');
     js.src = 'scripts/store.snake.js';
     document.head.appendChild(js);

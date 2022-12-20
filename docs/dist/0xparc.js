@@ -1,13 +1,35 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+'use strict';
+var __awaiter =
+    (this && this.__awaiter) ||
+    function (thisArg, _arguments, P, generator) {
+        function adopt(value) {
+            return value instanceof P
+                ? value
+                : new P(function (resolve) {
+                      resolve(value);
+                  });
+        }
+        return new (P || (P = Promise))(function (resolve, reject) {
+            function fulfilled(value) {
+                try {
+                    step(generator.next(value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function rejected(value) {
+                try {
+                    step(generator['throw'](value));
+                } catch (e) {
+                    reject(e);
+                }
+            }
+            function step(result) {
+                result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+            }
+            step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+    };
 const coordinateDistance = (a, b) => {
     return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 };
@@ -79,8 +101,7 @@ class LogoGenerator {
         const hue = Math.round(this.random() * 360);
         if (this.random() > 0.25) {
             return `hsl(${hue}, 49%, 75%)`;
-        }
-        else {
+        } else {
             return `hsl(${hue}, 38%, 45%)`;
         }
     }
@@ -95,11 +116,12 @@ class LogoGenerator {
         let point2 = this.randomPoint();
         const firstPoint = this.randomPoint();
         while (
-        // continue running while the line is either shorter than the min length
-        // OR
-        // longer than the max length
-        coordinateDistance(firstPoint, point2) <= minLength ||
-            coordinateDistance(firstPoint, point2) >= maxLength) {
+            // continue running while the line is either shorter than the min length
+            // OR
+            // longer than the max length
+            coordinateDistance(firstPoint, point2) <= minLength ||
+            coordinateDistance(firstPoint, point2) >= maxLength
+        ) {
             point2 = this.randomPoint();
         }
         this.logo.createLine(firstPoint.x, firstPoint.y, point2.x, point2.y, this.randomColor());
@@ -113,8 +135,7 @@ const getSeed = () => {
         newParams.set('seed', seed.toString());
         window.location.search = newParams.toString();
         return seed;
-    }
-    else {
+    } else {
         return parseInt(providedSeed);
     }
 };
@@ -124,9 +145,13 @@ const generate = (seed) => {
 };
 const copyButton = document.getElementById('copy');
 const generateButton = document.getElementById('generate');
-copyButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-    yield window.navigator.clipboard.writeText(document.getElementsByTagName('svg')[0].outerHTML);
-}));
+copyButton.addEventListener('click', () =>
+    __awaiter(void 0, void 0, void 0, function* () {
+        yield window.navigator.clipboard.writeText(
+            document.getElementsByTagName('svg')[0].outerHTML
+        );
+    })
+);
 generateButton.addEventListener('click', () => {
     const newSeed = Math.floor(Math.random() * 10000);
     const newParams = new URLSearchParams(window.location.search);

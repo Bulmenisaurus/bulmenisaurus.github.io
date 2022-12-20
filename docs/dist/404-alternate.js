@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 document.body.style.overflow = 'hidden';
 document.title = window.location.pathname.slice(1).split('/').pop().replace('-', ' ');
 (() => {
