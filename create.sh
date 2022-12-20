@@ -26,5 +26,5 @@ projectrootdir="${DIR}/docs"
 
 touch "${projectrootdir}/${name}.html"
 touch "${projectrootdir}/scripts/${name}.ts"
-touch "${projectrootdir}/stylesheets/${name}.scss"
+touch "${projectrootdir}/stylesheets/${name}.css"
 
