@@ -1,68 +1,35 @@
-/** {
+* {
     margin: 0;
     padding: 0;
-}*/
-html {
-    overflow: hidden;
+    font-family: monospace;
 }
 
 body {
-    display: grid;
-    place-items: center;
-    height: 100vh;
-    width: 100vw;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji';
-    font-size: 1.3em;
-}
-body.dark {
-    background-color: black;
-    color: white;
+    margin: 20px 10%;
 }
 
-.loading-bar {
-    height: 10px;
-    background-color: black;
-    animation: load 10s infinite;
-    animation-timing-function: linear;
+h1 {
+    margin-bottom: 20px;
 }
 
-@keyframes load {
-    100% {
-        width: 100vw;
-    }
-    20% {
-        width: 100%;
-    }
-    10% {
-        width: 100%;
-    }
-    0% {
-        width: 0%;
-    }
-}
-.loading-text {
-    margin: 5px 0;
+h2 {
+    margin-bottom: 10px;
 }
 
-canvas.sorting {
-    width: 70vmin;
-    height: 10.6060606061vmin;
+/* 😎 just don't use classes or ids at all */
+main > div {
+    display: flex;
+    gap: 16px;
+    /* flex-wrap: wrap; */
 }
 
-canvas.graph {
-    width: 80vmin;
-    height: 40vmin;
+main > div img {
+    width: 100%;
+    height: auto;
+    min-width: 100px;
 }
 
-canvas.voroni,
-canvas.triangulation {
-    width: 75vmin;
-    height: 75vmin;
-}
-
-.text-loading-bar,
-.text-loading {
-    white-space: pre;
-    font-family: monospace;
+main > div article {
+    flex-grow: 2;
+    min-width: 200px;
 }
