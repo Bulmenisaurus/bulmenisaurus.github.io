@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 document.body.dataset.rickrolled = 'false';
 const video = document.getElementsByTagName('video')[0];
 let videoLoaded = false;

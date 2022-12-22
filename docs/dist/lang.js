@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 const codeInput = document.getElementsByTagName('textarea')[0];
 const runCodeButton = document.getElementsByTagName('button')[0];
 runCodeButton.onclick = () => {
@@ -30,7 +30,8 @@ const runCode = (code) => {
     const variables = {};
     lines.forEach((i) => {
         const tokens = i.split(' ');
-        if (tokens.length <= 1) return;
+        if (tokens.length <= 1)
+            return;
         const [name, ...args] = tokens;
         handleInstruction(name.toLowerCase(), args, variables, langConsole);
     });
@@ -53,12 +54,15 @@ const formatStr = (str, variables) => {
 const handleInstruction = (name, instructionArguments, variables, langConsole) => {
     if (name === 'print') {
         langConsole.print(instructionArguments.join(' '));
-    } else if (name === 'printf') {
+    }
+    else if (name === 'printf') {
         const res = formatStr(instructionArguments.join(' '), variables);
         langConsole.print(res);
-    } else if (name === '#') {
+    }
+    else if (name === '#') {
         return;
-    } else if (name === 'set') {
+    }
+    else if (name === 'set') {
         if (instructionArguments.length < 1) {
             langConsole.print('provide variable name pls');
         }
@@ -66,7 +70,8 @@ const handleInstruction = (name, instructionArguments, variables, langConsole) =
             type: 'string',
             value: instructionArguments.slice(1).join(' '),
         };
-    } else {
+    }
+    else {
         langConsole.error(`Unknown instruction: \`${name}\``);
     }
 };

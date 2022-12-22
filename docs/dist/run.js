@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 ///////////////////
 // Date Helpers //
 ///////////////////
@@ -25,7 +25,8 @@ while (simpleDate(new Date()) !== simpleDate(DateI)) {
     }
 }
 const runAmountElem = document.getElementById('js-run-amount');
-if (runAmountElem) runAmountElem.innerText = minutesToRun.toString();
+if (runAmountElem)
+    runAmountElem.innerText = minutesToRun.toString();
 /////////////////////////
 // Inspirational quote //
 ////////////////////////
@@ -34,8 +35,8 @@ if (quoteElem) {
     fetch('https://type.fit/api/quotes')
         .then((response) => response.json())
         .then((quotes) => {
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            quoteElem.innerText = randomQuote.text + '\n\n - ' + randomQuote.author;
-        });
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        quoteElem.innerText = randomQuote.text + '\n\n - ' + randomQuote.author;
+    });
 }
 //# sourceMappingURL=run.js.map

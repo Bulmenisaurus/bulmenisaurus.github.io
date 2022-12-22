@@ -29,10 +29,14 @@
                 <input type="number" id="imag-input" value="0.35" step="0.01" />
             </label>
             <label>
-                Zoom <input type="range" id="zoom" value="1" min="1" max="10" />
+                Zoom
+                <input type="range" id="zoom-slider" value="1" min="0" step="0.001" max="100" />
                 <input type="number" id="zoom-input" value="1" step="0.01" />
             </label>
-            <label>Resolution (px) <input type="number" id="resolution" value="500" /> </label>
+            <label
+                >Resolution multiplier
+                <input type="number" id="resolution" value="1" max="10" step="0" />
+            </label>
         </div>
     </body>
 </html>
