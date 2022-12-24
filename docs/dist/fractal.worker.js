@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const placeholder_WasmRenderFunction = (width, height, offsetX, offsetY, zoom, uReal, uImag) => 0;
+const placeholder_WasmRenderFunction = (width, height, offsetX, offsetY, zoom, uReal, uImag, is_mandlebrot) => 0;
 let render;
 let memory;
 let hasMainInitialized = false;
@@ -28,8 +28,8 @@ self.onmessage = (e) => __awaiter(void 0, void 0, void 0, function* () {
         yield main();
         hasMainInitialized = true;
     }
-    const [width, height, offsetX, offsetY, zoom, uReal, uImag] = e.data;
-    const renderedDataPtr = render(width, height, offsetX, offsetY, zoom, uReal, uImag);
+    const [width, height, offsetX, offsetY, zoom, uReal, uImag, is_mandlebrot] = e.data;
+    const renderedDataPtr = render(width, height, offsetX, offsetY, zoom, uReal, uImag, is_mandlebrot);
     const renderedData = new Uint8ClampedArray(memory.buffer, renderedDataPtr, width * height * 4);
     postMessage(renderedData);
 });

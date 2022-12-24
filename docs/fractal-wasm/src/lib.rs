@@ -79,24 +79,33 @@ fn get_pixel_color(
     scale_factor: f64,
     u_real: f64,
     u_imag: f64,
+    is_mandlebrot: bool,
 ) -> RGBA {
-    let (mut a, mut c, mut e, mut f, mut g) = (
-        Complex::default(),
-        Complex::default(),
-        Complex::default(),
-        Complex::default(),
-        Complex::default(),
-    );
+    let (mut a, mut e, mut f);
+    let mut c = Complex::default();
 
-    let mut z = Complex {
-        real: f64::from(x - width / 2) * scale_factor - offset_x,
-        imaginary: f64::from(y - height / 2) * scale_factor - offset_y,
+    let u = if is_mandlebrot {
+        Complex {
+            real: f64::from(x - width / 2) * scale_factor - offset_x,
+            imaginary: f64::from(y - height / 2) * scale_factor - offset_y,
+        }
+    } else {
+        Complex {
+            real: u_real,
+            imaginary: u_imag,
+        }
     };
 
-    // book suggests 0.35 + 0.35i
-    let u = Complex {
-        real: u_real,
-        imaginary: u_imag,
+    let mut z = if is_mandlebrot {
+        Complex {
+            real: u_real,
+            imaginary: u_imag,
+        }
+    } else {
+        Complex {
+            real: f64::from(x - width / 2) * scale_factor - offset_x,
+            imaginary: f64::from(y - height / 2) * scale_factor - offset_y,
+        }
     };
 
     let amount_iterations = 50;
@@ -146,6 +155,7 @@ pub fn render(
     zoom: f64,
     u_real: f64,
     u_imag: f64,
+    is_mandlebrot: bool,
 ) -> *const u8 {
     let mut data = Vec::new();
     let scale_factor: f64 = 1. / (f64::from(width) * zoom);
@@ -162,6 +172,7 @@ pub fn render(
                 scale_factor,
                 u_real,
                 u_imag,
+                is_mandlebrot,
             );
 
             data.extend(pixel.into_array())

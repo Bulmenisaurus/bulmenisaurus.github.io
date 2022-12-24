@@ -5,7 +5,8 @@ const placeholder_WasmRenderFunction = (
     offsetY: number,
     zoom: number,
     uReal: number,
-    uImag: number
+    uImag: number,
+    is_mandlebrot: boolean
 ) => 0;
 
 type WasmRenderFunction = typeof placeholder_WasmRenderFunction;
@@ -36,9 +37,18 @@ self.onmessage = async (e) => {
         hasMainInitialized = true;
     }
 
-    const [width, height, offsetX, offsetY, zoom, uReal, uImag] = e.data;
+    const [width, height, offsetX, offsetY, zoom, uReal, uImag, is_mandlebrot] = e.data;
 
-    const renderedDataPtr = render(width, height, offsetX, offsetY, zoom, uReal, uImag);
+    const renderedDataPtr = render(
+        width,
+        height,
+        offsetX,
+        offsetY,
+        zoom,
+        uReal,
+        uImag,
+        is_mandlebrot
+    );
     const renderedData = new Uint8ClampedArray(memory.buffer, renderedDataPtr, width * height * 4);
 
     postMessage(renderedData);

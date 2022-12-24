@@ -34,8 +34,22 @@ div#side-bar {
 }
 
 div#side-bar input {
-    display: block;
     margin: 5px 0;
+}
+
+div#side-bar .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+div#side-bar .input-group label {
+    font-size: 15px;
+}
+
+input[type='number'],
+input[type='range'] {
+    display: block;
 }
 
 div#side-bar input[type='number'] {

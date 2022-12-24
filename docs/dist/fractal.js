@@ -42,6 +42,7 @@ class ControllableCanvas {
             real: 0.35,
             imag: 0.35,
         };
+        this.fractalType = 0;
         this.reRender = debounce(this.render.bind(this), 100);
         this.debug = debugFunction;
         this.resize();
@@ -126,6 +127,7 @@ class ControllableCanvas {
             this.cameraZoom,
             this.fractalUConstant.real,
             this.fractalUConstant.imag,
+            this.fractalType === 1,
         ]);
     }
 }
@@ -147,6 +149,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const zoomTextInput = document.getElementById('zoom-input');
     const zoomSlideInput = document.getElementById('zoom-slider');
     const resolutionInput = document.getElementById('resolution');
+    const fractalTypeContainer = document.getElementById('fractal-type');
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
@@ -203,9 +206,27 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         zoomSlideInput.value = zoom.toFixed(3);
         zoomTextInput.value = zoom.toFixed(3);
     };
+    const fractalTypeRadioChange = (rerender = true) => {
+        const selectedRadio = fractalTypeContainer.querySelector('input[type="radio"]:checked');
+        if (selectedRadio === null) {
+            throw new Error('cannot find selected radio button');
+        }
+        const fractalTypeEnum = {
+            julia: 0,
+            mandelbrot: 1,
+        };
+        if (!(selectedRadio.value in fractalTypeEnum)) {
+            throw new Error(`Unknown fractal type ${selectedRadio.value}, expected one of ${Object.keys(fractalTypeEnum)}`);
+        }
+        const fractalType = fractalTypeEnum[selectedRadio.value];
+        interactiveCanvas.fractalType = fractalType;
+        if (rerender)
+            interactiveCanvas.reRender();
+    };
     realTextInputChange(false);
     imagTextInputChange(false);
     zoomTextInputChange(false);
+    fractalTypeRadioChange(false);
     realTextInput.addEventListener('change', () => realTextInputChange());
     realSlideInput.addEventListener('change', () => realSlideInputChange());
     imagTextInput.addEventListener('change', () => imagTextInputChange());
@@ -213,6 +234,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     zoomTextInput.addEventListener('input', () => zoomTextInputChange());
     zoomSlideInput.addEventListener('input', () => zoomSlideInputChange());
     interactiveCanvas.onZoom = zoomCanvasChangeCallback;
+    fractalTypeContainer.querySelectorAll('input[type="radio"]').forEach((elem) => {
+        elem.addEventListener('input', (e) => fractalTypeRadioChange());
+    });
     resolutionInput.addEventListener('change', () => {
         if (resolutionInput.value.length === 0) {
             return;
@@ -224,7 +248,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         interactiveCanvas.reRender();
     });
     // only render after the config above has been set
-    interactiveCanvas.render();
+    interactiveCanvas.reRender();
 });
 main();
 export {};
