@@ -8,30 +8,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const strHash = (str, max) => {
-    let hash = 0;
-    if (str.length == 0)
-        return hash;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash = hash & hash;
-    }
-    return (Math.abs(hash) % max) + 1;
-};
-const urlHash = strHash(window.location.href, 5);
-console.log(urlHash);
-const messages = [
-    'Well..... this is akward. A 404. Do you perhaps want some tea?',
-    "Oh no! What are these weird numbers? Is it a secret code? Are aliens communicating with me? Nope, It's just a 404 page!",
-    "Oh no! This page doesn't seem to exist!\nAnyway..",
-    "Ouch, it looks like this page doesn't exist.",
-    'Sadly, a 404 error occured. I wonder if you can collect the next card in the series, a 405, too.',
-    "This page doesn't exist. Oh well!",
+let additionalMessage = [];
+let candidateEmoji = [
+    '🥲',
+    '😔',
+    '☹️',
+    '🥺',
+    '🥹',
+    '😓',
+    '😞',
+    '😖',
+    '😭',
+    '😢',
+    '😥',
+    '😟',
+    '👌',
+    '🤯',
+    '😶‍🌫️',
+    '😏',
+    '🤨',
 ];
+for (let i = 0; i < Math.random() * 10; i++) {
+    let randomEmoji = candidateEmoji[Math.floor(Math.random() * candidateEmoji.length)];
+    additionalMessage.push(randomEmoji);
+}
 const messageElem = document.getElementById('404-message');
-if (messageElem)
-    messageElem.innerText = messages[urlHash];
+messageElem.innerText += additionalMessage.join('');
 const repositoryFile = (owner, repo) => __awaiter(void 0, void 0, void 0, function* () {
     // https://stackoverflow.com/questions/25022016/get-all-file-names-from-a-github-repo-through-the-github-api
     const repsonse = yield fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);

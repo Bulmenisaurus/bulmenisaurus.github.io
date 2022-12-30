@@ -1,31 +1,32 @@
-const strHash = (str: string, max: number) => {
-    let hash = 0;
-
-    if (str.length == 0) return hash;
-
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash = hash & hash;
-    }
-
-    return (Math.abs(hash) % max) + 1;
-};
-
-const urlHash = strHash(window.location.href, 5);
-console.log(urlHash);
-const messages = [
-    'Well..... this is akward. A 404. Do you perhaps want some tea?',
-    "Oh no! What are these weird numbers? Is it a secret code? Are aliens communicating with me? Nope, It's just a 404 page!",
-    "Oh no! This page doesn't seem to exist!\nAnyway..",
-    "Ouch, it looks like this page doesn't exist.",
-    'Sadly, a 404 error occured. I wonder if you can collect the next card in the series, a 405, too.',
-    "This page doesn't exist. Oh well!",
+let additionalMessage: string[] = [];
+let candidateEmoji: string[] = [
+    '🥲',
+    '😔',
+    '☹️',
+    '🥺',
+    '🥹',
+    '😓',
+    '😞',
+    '😖',
+    '😭',
+    '😢',
+    '😥',
+    '😟',
+    '👌',
+    '🤯',
+    '😶‍🌫️',
+    '😏',
+    '🤨',
 ];
 
-const messageElem = document.getElementById('404-message');
+for (let i = 0; i < Math.random() * 10; i++) {
+    let randomEmoji = candidateEmoji[Math.floor(Math.random() * candidateEmoji.length)];
+    additionalMessage.push(randomEmoji);
+}
 
-if (messageElem) messageElem.innerText = messages[urlHash];
+const messageElem = document.getElementById('404-message')!;
+
+messageElem.innerText += additionalMessage.join('');
 
 /* getting the "did you mean foo" section
 Steps:
