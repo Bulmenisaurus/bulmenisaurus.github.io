@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Quotes</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            html {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            figure {
+                margin-top: 40px;
+                margin-bottom: 10px;
+            }
+
+            figure:first-of-type {
+                margin-top: 10px;
+            }
+
+            blockquote {
+                margin: 5px 0;
+            }
+
+            blockquote p {
+                padding: 15px;
+                background: #eee;
+                border-radius: 5px;
+            }
+
+            blockquote p::before {
+                content: '\201C';
+            }
+
+            blockquote p::after {
+                content: '\201D';
+            }
+
+            /* According to the source you should use an em dash for quote attribution */
+            /* https://grammarpartyblog.com/2011/08/23/simply-dashing-part-one-the-em-dash/ */
+            /* escaped because mdn does so */
+            blockquote + figcaption::before {
+                content: '\2014';
+            }
+
+            body {
+                margin: 40px auto;
+                max-width: 80ch;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Quotes</h1>
+        <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/blockquote -->
+        <figure>
+            <blockquote cite="https://www.brainyquote.com/quotes/antoine_de_saintexupery_121910">
+                <p>
+                    A designer knows he has achieved perfection not when there is nothing left to
+                    add, but when there is nothing left to take away.
+                </p>
+            </blockquote>
+            <figcaption>Antoine de Saint-Exupery</figcaption>
+        </figure>
+        <!-- Template for this: https://docs.emmet.io/cheat-sheet/ -->
+        <!-- figure>blockquote[cite=""]>p^figcaption -->
+        <figure>
+            <blockquote
+                cite="https://www.hagerty.com/media/advice/a-few-things-to-know-before-you-steal-my-914/"
+            >
+                <p>Do not become emboldened by your progress</p>
+            </blockquote>
+            <figcaption>Norman Garrett</figcaption>
+        </figure>
+        <figure>
+            <blockquote>
+                <p>What I cannot create, I do not understand</p>
+            </blockquote>
+            <figcaption>Richard Feynman</figcaption>
+        </figure>
+        <figure>
+            <blockquote cite="https://quoteinvestigator.com/2015/01/26/doing/">
+                <p>People who say it cannot be done should not interrupt those who are doing it.</p>
+            </blockquote>
+            <figcaption>Me</figcaption>
+        </figure>
+        <figure>
+            <blockquote>
+                <p>Man who have last laugh, not get joke</p>
+            </blockquote>
+            <figcaption>Confucius</figcaption>
+        </figure>
+    </body>
+</html>
