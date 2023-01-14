@@ -34,14 +34,14 @@ const GitHubSearchForKeyWord = async (
     keyword: string
 ): Promise<GitHubSearchResponse> => {
     const cacheKey = `${keyword},${user}`;
-    const cachedStorage = sessionStorage.getItem(cacheKey);
+    const cachedStorage = localStorage.getItem(cacheKey);
 
     if (cachedStorage !== null) {
         try {
             return JSON.parse(cachedStorage);
         } catch {
             console.error('failed to parse cached value, clearing');
-            sessionStorage.clear();
+            localStorage.clear();
         }
     }
 
@@ -58,7 +58,7 @@ const GitHubSearchForKeyWord = async (
     }
 
     try {
-        sessionStorage.setItem(cacheKey, JSON.stringify(filterOnlyNeededValues(response)));
+        localStorage.setItem(cacheKey, JSON.stringify(filterOnlyNeededValues(response)));
     } catch (e) {
         console.warn(`could not cache response with key ${cacheKey}`);
         console.error(e);
@@ -127,6 +127,7 @@ const filterResults = (
 const main = () => {
     const userNameInput = document.getElementById('user-input') as HTMLInputElement;
     const submitButton = document.getElementById('run-query') as HTMLButtonElement;
+    const clearCacheButton = document.getElementById('clear-cache') as HTMLButtonElement;
     const resultsContainer = document.getElementById('results-container') as HTMLDivElement;
     const filterRepoInput = document.getElementById('ignore-repo') as HTMLInputElement;
 
@@ -147,6 +148,8 @@ const main = () => {
         lastResults = response;
         displayResults(filterResults(response, filterRepoInput.value), resultsContainer);
     });
+
+    clearCacheButton.addEventListener('click', () => localStorage.clear());
 
     filterRepoInput.addEventListener('input', () => {
         if (lastResults === undefined) {

@@ -26,14 +26,14 @@ const filterOnlyNeededValues = (searchResponse) => ({
 // https://docs.github.com/en/rest/search?apiVersion=2022-11-28
 const GitHubSearchForKeyWord = (user, keyword) => __awaiter(void 0, void 0, void 0, function* () {
     const cacheKey = `${keyword},${user}`;
-    const cachedStorage = sessionStorage.getItem(cacheKey);
+    const cachedStorage = localStorage.getItem(cacheKey);
     if (cachedStorage !== null) {
         try {
             return JSON.parse(cachedStorage);
         }
         catch (_a) {
             console.error('failed to parse cached value, clearing');
-            sessionStorage.clear();
+            localStorage.clear();
         }
     }
     const searchUrl = `https://api.github.com/search/code?q=${encodeURIComponent(`${keyword} user:${user}`)}`;
@@ -42,7 +42,7 @@ const GitHubSearchForKeyWord = (user, keyword) => __awaiter(void 0, void 0, void
         console.warn('Warning: results may be incomplete, but I (the JavaScript runtime) do not know how to fix this');
     }
     try {
-        sessionStorage.setItem(cacheKey, JSON.stringify(filterOnlyNeededValues(response)));
+        localStorage.setItem(cacheKey, JSON.stringify(filterOnlyNeededValues(response)));
     }
     catch (e) {
         console.warn(`could not cache response with key ${cacheKey}`);
@@ -83,6 +83,7 @@ const filterResults = (searchResponse, repoFilterStr) => {
 const main = () => {
     const userNameInput = document.getElementById('user-input');
     const submitButton = document.getElementById('run-query');
+    const clearCacheButton = document.getElementById('clear-cache');
     const resultsContainer = document.getElementById('results-container');
     const filterRepoInput = document.getElementById('ignore-repo');
     let lastResults = undefined;
@@ -100,6 +101,7 @@ const main = () => {
         lastResults = response;
         displayResults(filterResults(response, filterRepoInput.value), resultsContainer);
     }));
+    clearCacheButton.addEventListener('click', () => localStorage.clear());
     filterRepoInput.addEventListener('input', () => {
         if (lastResults === undefined) {
             return;
