@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Packing</title>
+        <link rel="stylesheet" href="./stylesheets/pack.css" />
+        <script src="./dist/pack.js"></script>
+
+        <!-- TODO: self host this -->
+        <link
+            rel="stylesheet"
+            href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css"
+        />
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+        <script>
+            hljs.highlightAll();
+        </script>
+    </head>
+    <body>
+        <main>
+            <h1>Packing in code golf</h1>
+            <p>
+                Say you wanted, for <a href="https://code.golf/ascii-table#python">some reason</a>,
+                to print the following string in the shortest code:
+            </p>
+            <pre><code class="language-plaintext">   2 3 4 5 6 7
+ -------------
+0:   0 @ P ` p
+1: ! 1 A Q a q
+2: " 2 B R b r
+3: # 3 C S c s
+4: $ 4 D T d t
+5: % 5 E U e u
+6: & 6 F V f v
+7: ' 7 G W g w
+8: ( 8 H X h x
+9: ) 9 I Y i y
+A: * : J Z j z
+B: + ; K [ k {
+C: , &lt; L \ l |
+D: - = M ] m }
+E: . > N ^ n ~
+F: / ? O _ o DEL
+</code></pre>
+            <p>
+                Obviously, you could just strick that into a multiline string and print it directly
+            </p>
+            <pre><code class="language-python">print("""   2 3 4 5 6 7
+...
+F: / ? O _ o DEL""")</code></pre>
+            <p>But surely there has to be a better way?</p>
+            <p>
+                Well, one way that you could be more efficient is through the use of packing.
+                Packing is the art abusing character counts by using
+                <strong>unicode characters</strong> or other compression techniques.
+            </p>
+            <h2>UTF-16</h2>
+            <p>
+                Unicode characters are counted as a single character, but may be composed of many
+                bytes. For example, this: <code>"😀"</code> is a single character (you can verify
+                this by running <code>print(len("😀"))</code>). However, it stores more than one
+                byte:
+            </p>
+            <pre><code class="language-python">
+print("😀".encode("utf-8") == b'\xf0\x9f\x98\x80')
+        </code></pre>
+            <p>
+                One common python packer is the following: (taken from the
+                <a href="https://code.golf/wiki/langs/python">code.golf wiki</a>
+            </p>
+            <pre><code class="language-python">print('CODE'.encode().decode('u16'))</code></pre>
+            <p>
+                First, it takes some code, and encodes it as <code>utf-8</code>, the default. UTF-8
+                stores the code points and stores them as bytes. These bytes don't have an encoding:
+                they're just a list of integers. So then, we interpret these bytes as UTF-16, which
+                takes pairs of two bytes and interprets them as a single character. (This also has
+                the side effect of requiring that the number of bytes in our program be divisible by
+                2). Thus, we just used twice as less characters!
+            </p>
+            <p>Decoding this is just as simple:</p>
+            <pre><code class="language-python">exec(bytes('...','u16')[2:]) # for executing
+'...'.encode("u16")[2:].decode() # for using as a string</code></pre>
+            <p>
+                We take our unicode string, decode it as UTF-16, remove the two bytes, and execute
+                the code. The reason for skipping the first two bytes is that python inserts a
+                two-byte
+                <a href="https://en.wikipedia.org/wiki/Byte_order_mark">byte order mark</a> that we
+                must skip.
+            </p>
+            <p>
+                The reason that we cannot use UTF-32 is that the resulting code points from grouping
+                4 characters is too large.
+            </p>
+            <p>
+                Using this method, our original text is packed into just 136 chars, exactly half of
+                the original!
+            </p>
+        </main>
+    </body>
+</html>
