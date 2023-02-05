@@ -50,18 +50,17 @@ F: / ? O _ o DEL
             <pre><code class="language-python">print("""   2 3 4 5 6 7
 ...
 F: / ? O _ o DEL""")</code></pre>
-            <p>But surely there has to be a better way?</p>
             <p>
-                Well, one way that you could be more efficient is through the use of packing.
-                Packing is the art abusing character counts by using
+                One way that you could do that in less space is through the use of packing. Packing
+                is the art abusing character counts by using
                 <strong>unicode characters</strong> or other compression techniques.
             </p>
             <h2>UTF-16</h2>
             <p>
-                Unicode characters are counted as a single character, but may be composed of many
-                bytes. For example, this: <code>"😀"</code> is a single character (you can verify
-                this by running <code>print(len("😀"))</code>). However, it stores more than one
-                byte:
+                Unicode characters that are counted as a single character may be composed of many
+                bytes. For example, this emoji <code>"😀"</code> is a single character (you can
+                verify this by running <code>print(len("😀"))</code>). However, in UTF-8 it is 4
+                bytes long!
             </p>
             <pre><code class="language-python">
 print("😀".encode("utf-8") == b'\xf0\x9f\x98\x80')
@@ -72,20 +71,19 @@ print("😀".encode("utf-8") == b'\xf0\x9f\x98\x80')
             </p>
             <pre><code class="language-python">print('CODE'.encode().decode('u16'))</code></pre>
             <p>
-                First, it takes some code, and encodes it as <code>utf-8</code>, the default. UTF-8
-                stores the code points and stores them as bytes. These bytes don't have an encoding:
-                they're just a list of integers. So then, we interpret these bytes as UTF-16, which
-                takes pairs of two bytes and interprets them as a single character. (This also has
-                the side effect of requiring that the number of bytes in our program be divisible by
-                2). Thus, we just used twice as less characters!
+                First, it takes a string, and converts it to bytes according to the (default)
+                <code>utf-8</code> encoding. Then, we reinterpret those bytes as UTF-16, which takes
+                pairs of two bytes and interprets them as a single code point. (This also has the
+                side effect of requiring that the number of bytes in our program be divisible by 2).
+                Thus, we just used twice as less characters!
             </p>
             <p>Decoding this is just as simple:</p>
             <pre><code class="language-python">exec(bytes('...','u16')[2:]) # for executing
 '...'.encode("u16")[2:].decode() # for using as a string</code></pre>
             <p>
-                We take our unicode string, decode it as UTF-16, remove the two bytes, and execute
-                the code. The reason for skipping the first two bytes is that python inserts a
-                two-byte
+                We take our unicode string, convert it to bytes according to UTF-16, remove the
+                first two characters, and execute the code. The reason for skipping the first two
+                bytes is that python inserts a two-byte
                 <a href="https://en.wikipedia.org/wiki/Byte_order_mark">byte order mark</a> that we
                 must skip.
             </p>
