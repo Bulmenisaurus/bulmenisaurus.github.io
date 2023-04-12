@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Perlin</title>
+    </head>
+    <body>
+        <canvas id="main"></canvas>
+        <script>
+            class Perlin {
+                constructor(width, height) {
+                    /** @type {number} */
+                    this.width = width;
+                    /** @type {number} */
+                    this.height = height;
+
+                    /** @type {{x: number, y: number}[]}*/
+                    this.gradients = [];
+                    for (let i = 0; i < (this.width + 1) * (this.height + 1); i++) {
+                        this.gradients.push(this.getRandomGradient());
+                    }
+                }
+
+                getRandomGradient() {
+                    const angle = Math.random() * 2 * Math.PI;
+                    return { x: Math.cos(angle), y: Math.sin(angle) };
+                }
+
+                getDotProduct(x1, y1, x2, y2) {
+                    return x1 * x2 + y1 * y2;
+                }
+
+                calculateDotProduct(pointX, pointY, cornerX, cornerY) {
+                    const cornerGradient = this.gradients[cornerX + cornerY * this.height];
+                    const offsetX = pointX - cornerX;
+                    const offsetY = pointY - cornerY;
+
+                    const dotProduct = this.getDotProduct(
+                        cornerGradient.x,
+                        cornerGradient.y,
+                        offsetX,
+                        offsetY
+                    );
+
+                    return dotProduct;
+                }
+
+                smootherStep(x) {
+                    return 6 * x ** 5 - 15 * x ** 4 + 10 * x ** 3;
+                }
+
+                interpolate(fromValue, toValue, byAmount) {
+                    return (toValue - fromValue) * this.smootherStep(byAmount) + fromValue;
+                }
+
+                /**
+                 * @param x {number}
+                 * @param y {number}
+                 * @returns {number}
+                 */
+                getPixel(x, y) {
+                    // find the four corners of the tile the give point is in
+                    const cornerX0 = Math.floor(x);
+                    const cornerX1 = cornerX0 + 1;
+                    const cornerY0 = Math.floor(y);
+                    const cornerY1 = cornerY0 + 1;
+
+                    const offsetX = x - cornerX0;
+                    const offsetY = y - cornerY0;
+
+                    // generate the four dot products
+                    const dotProduct0 = this.calculateDotProduct(x, y, cornerX0, cornerY0); // top left
+                    const dotProduct1 = this.calculateDotProduct(x, y, cornerX1, cornerY0); // top right
+                    const dotProduct2 = this.calculateDotProduct(x, y, cornerX1, cornerY1); // bottom right
+                    const dotProduct3 = this.calculateDotProduct(x, y, cornerX0, cornerY1); // bottom left
+
+                    const interpolated0 = this.interpolate(dotProduct0, dotProduct1, offsetX);
+                    const interpolated1 = this.interpolate(dotProduct3, dotProduct2, offsetX);
+
+                    const interpolated2 = this.interpolate(interpolated0, interpolated1, offsetY);
+                    // interpolated2 ∊ [-1, 1]
+
+                    const normalized = (interpolated2 + 1) / 2;
+                    // interpolated2 ∊ [0, 1]
+
+                    const pixelColor = Math.floor(normalized * 255);
+                    // pixelColor ∊ [0, 255] (and an integer)
+
+                    return pixelColor;
+                }
+            }
+
+            const render = () => {
+                /** @type {HTMLCanvasElement} */
+                const canvas = document.getElementById('main');
+                const ctx = canvas.getContext('2d');
+
+                const HEIGHT = 300;
+                const WIDTH = 300;
+
+                const NODE_HEIGHT = 10;
+                const NODE_WIDTH = 10;
+
+                canvas.width = WIDTH;
+                canvas.height = HEIGHT;
+
+                const perlin = new Perlin(NODE_HEIGHT, NODE_WIDTH);
+                // const perlin2 = new Perlin(NODE_HEIGHT * 3, NODE_WIDTH * 3);
+
+                const imageData = ctx.createImageData(WIDTH, HEIGHT);
+                for (let x = 0; x < WIDTH; x++) {
+                    for (let y = 0; y < HEIGHT; y++) {
+                        const octave1 = perlin.getPixel(
+                            x / (WIDTH / NODE_WIDTH),
+                            y / (HEIGHT / NODE_HEIGHT)
+                        );
+                        // const octave2 = perlin2.getPixel(
+                        //     x / (WIDTH / (NODE_WIDTH * 3)),
+                        //     y / (HEIGHT / (NODE_HEIGHT * 3))
+                        // );
+
+                        const pixelColor = octave1; /** 0.8 + octave2 * 0.2*/
+                        let i = x + y * WIDTH;
+                        imageData.data[i * 4 + 0] = pixelColor;
+                        imageData.data[i * 4 + 1] = pixelColor;
+                        imageData.data[i * 4 + 2] = pixelColor;
+                        imageData.data[i * 4 + 3] = 255;
+                    }
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                console.log('done');
+            };
+
+            render();
+        </script>
+    </body>
+</html>
