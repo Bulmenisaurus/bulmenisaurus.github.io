@@ -8,23 +8,51 @@
     </head>
     <body>
         <canvas id="main"></canvas>
+        <input type="number" placeholder="seed" style="display: block" id="seed" />
         <script>
             class Perlin {
-                constructor(width, height) {
+                constructor(width, height, seed) {
                     /** @type {number} */
                     this.width = width;
                     /** @type {number} */
                     this.height = height;
 
+                    this.seed = seed;
+
                     /** @type {{x: number, y: number}[]}*/
                     this.gradients = [];
                     for (let i = 0; i < (this.width + 1) * (this.height + 1); i++) {
-                        this.gradients.push(this.getRandomGradient());
+                        const x = i % (this.width + 1);
+                        const y = Math.floor(i / (this.height + 1));
+                        this.gradients.push(this.getRandomGradient(x, y));
                     }
                 }
 
-                getRandomGradient() {
-                    const angle = Math.random() * 2 * Math.PI;
+                getRandomGradient(x, y) {
+                    // basically stolen from https://stackoverflow.com/a/8831937/13996389
+                    let a = x;
+                    let b = y;
+                    let c = this.seed;
+                    let d = a + b;
+
+                    let t = 0;
+
+                    for (let i = 0; i < 20; i++) {
+                        a >>>= 0;
+                        b >>>= 0;
+                        c >>>= 0;
+                        d >>>= 0;
+                        t = (a + b) | 0;
+                        a = b ^ (b >>> 9);
+                        b = (c + (c << 3)) | 0;
+                        c = (c << 21) | (c >>> 11);
+                        d = (d + 1) | 0;
+                        t = (t + d) | 0;
+                        c = (c + t) | 0;
+                    }
+                    const random = (t >>> 0) / 4294967296;
+
+                    const angle = random * 2 * Math.PI;
                     return { x: Math.cos(angle), y: Math.sin(angle) };
                 }
 
@@ -97,6 +125,10 @@
                 const canvas = document.getElementById('main');
                 const ctx = canvas.getContext('2d');
 
+                /** @type {HTMLInputElement} */
+                const seedElement = document.getElementById('seed');
+                const seed = parseInt(seedElement.value);
+
                 const HEIGHT = 300;
                 const WIDTH = 300;
 
@@ -106,7 +138,7 @@
                 canvas.width = WIDTH;
                 canvas.height = HEIGHT;
 
-                const perlin = new Perlin(NODE_HEIGHT, NODE_WIDTH);
+                const perlin = new Perlin(NODE_HEIGHT, NODE_WIDTH, seed);
                 // const perlin2 = new Perlin(NODE_HEIGHT * 3, NODE_WIDTH * 3);
 
                 const imageData = ctx.createImageData(WIDTH, HEIGHT);
@@ -135,6 +167,8 @@
             };
 
             render();
+
+            document.getElementById('seed').oninput = () => render();
         </script>
     </body>
 </html>
